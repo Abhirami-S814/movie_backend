@@ -1,0 +1,78 @@
+package com.MovieTicketBooking.MovieTicketBooking.User;
+
+
+import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieModel;
+import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+
+@RestController
+@RequestMapping(path = "/api/userdetails")
+@CrossOrigin
+public class UserController {
+
+    @Autowired
+    UserService userService;
+
+
+    //User Registration
+
+    @PostMapping(path = "/userreg")
+    public ResponseEntity<?> adduser(@RequestBody UserModel userModel){
+        try{
+             return userService.userreg(userModel);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    //user login
+    @PostMapping(path = "/userlogin")
+    public ResponseEntity<?> loginuser(@RequestBody UserLoginDto userLoginDto){
+        try {
+            return userService.userlogin(userLoginDto);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong",HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    //forgot password
+    @PutMapping(path = "/resetpasswordUser")
+    public ResponseEntity<?> restpass(@RequestParam String email,@RequestParam String password){
+        try{
+            return userService.resetuserpassword(email,password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong",HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    //User search movie by name
+    @GetMapping(path = "/searchmovie")
+    public ResponseEntity<List<MovieModel>> search(@RequestParam String movieName) {
+        return userService.searchmovie(movieName);
+    }
+
+    //Get all movies
+    @GetMapping(path = "/getallmovies")
+    public ResponseEntity<List<MovieModel>> allmovies(){
+        return userService.getallmovies();
+    }
+
+//-----------------------------------------------------------------------------
+
+    @GetMapping("/checkemail")
+    public ResponseEntity<String> checkEmail(@RequestParam String userEmail) {
+        if (userService.isEmailAlreadyRegistered(userEmail)) {
+            return new ResponseEntity<>("Email already registered",HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("email available",HttpStatus.OK);
+    }
+}
