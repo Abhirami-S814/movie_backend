@@ -9,7 +9,6 @@ import lombok.Data;
 @Entity
 @Table(name = "ticketCategoryTbl")
 @Data
-@JsonIgnoreProperties("theatreModel")
 public class TicketCategoryModel {
 
     @Id
@@ -20,16 +19,6 @@ public class TicketCategoryModel {
     @Column(name = "ticketCate")
     private String ticketCate;
 
-    @Column(name = "ticketRate")
-    private Double ticketRate;
-
-    @ManyToOne
-    @JoinColumn(name = "theatre_id", nullable = false)
-    private TheatreModel theatreModel;
-
-    public Integer getTheatreId() {
-        return theatreModel != null ? theatreModel.getTheatreId() : null;
-    }
 
 
     public Integer getTicketCateId() {
@@ -48,19 +37,6 @@ public class TicketCategoryModel {
         this.ticketCate = ticketCate;
     }
 
-    public Double getTicketRate() {
-        return ticketRate;
-    }
 
-    public void setTicketRate(Double ticketRate) {
-        this.ticketRate = ticketRate;
-    }
 
-    public TheatreModel getTheatreModel() {
-        return theatreModel;
-    }
-
-    public void setTheatreModel(TheatreModel theatreModel) {
-        this.theatreModel = theatreModel;
-    }
 }

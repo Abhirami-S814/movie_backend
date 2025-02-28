@@ -14,7 +14,10 @@ public interface ShowTimeRepo extends JpaRepository<ShowTimeModel, Integer> {
 
     ResponseEntity<?> deleteByShowtimeIdAndTheatreId(Integer showTimeId, Integer theatreId);
 
-    Optional<ShowTimeModel> findByTheatreIdAndShowtimeId(Integer theatreId, Integer showtimeId);
 
     List<ShowTimeModel> findByTheatreId(Integer theatreId);
+
+    Optional<ShowTimeModel> findByTheatreIdAndShowtimeIdAndDateId(Integer theatreId, Integer showtimeId, Integer dateId);
+
+    Optional<ShowTimeModel> findByTheatreIdAndShowtimeId(Integer theatreId, Integer showtimeId);
 }

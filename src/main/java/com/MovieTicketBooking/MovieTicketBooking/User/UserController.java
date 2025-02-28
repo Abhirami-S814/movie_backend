@@ -32,6 +32,15 @@ public class UserController {
         return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @GetMapping("/checkemail")
+    public ResponseEntity<String> checkEmail(@RequestParam String userEmail) {
+        if (userService.isEmailAlreadyRegistered(userEmail)) {
+            return new ResponseEntity<>("Email already registered",HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("email available",HttpStatus.OK);
+    }
+
+
     //user login
     @PostMapping(path = "/userlogin")
     public ResponseEntity<?> loginuser(@RequestBody UserLoginDto userLoginDto){
@@ -66,13 +75,6 @@ public class UserController {
         return userService.getallmovies();
     }
 
-//-----------------------------------------------------------------------------
+    
 
-    @GetMapping("/checkemail")
-    public ResponseEntity<String> checkEmail(@RequestParam String userEmail) {
-        if (userService.isEmailAlreadyRegistered(userEmail)) {
-            return new ResponseEntity<>("Email already registered",HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>("email available",HttpStatus.OK);
-    }
 }

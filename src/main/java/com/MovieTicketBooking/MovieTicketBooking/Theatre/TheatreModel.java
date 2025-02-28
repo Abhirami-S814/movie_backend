@@ -31,14 +31,11 @@ public class TheatreModel {
     @Column(name = "location")
     private String location;
 
+    @Column(name = "noOfScreens")
+    private Integer noOfScreens;
 
     @Column(name = "contact")
     private String contact;
-
-
-    @OneToMany(mappedBy = "theatreModel", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<TicketCategoryModel> ticketCategories;
 
 
     public Integer getTheatreId() {
@@ -65,14 +62,6 @@ public class TheatreModel {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getLocation() {
         return location;
     }
@@ -81,19 +70,27 @@ public class TheatreModel {
         this.location = location;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Integer getNoOfScreens() {
+        return noOfScreens;
+    }
+
+    public void setNoOfScreens(Integer noOfScreens) {
+        this.noOfScreens = noOfScreens;
+    }
+
     public String getContact() {
         return contact;
     }
 
     public void setContact(String contact) {
         this.contact = contact;
-    }
-
-    public List<TicketCategoryModel> getTicketCategories() {
-        return ticketCategories;
-    }
-
-    public void setTicketCategories(List<TicketCategoryModel> ticketCategories) {
-        this.ticketCategories = ticketCategories;
     }
 }

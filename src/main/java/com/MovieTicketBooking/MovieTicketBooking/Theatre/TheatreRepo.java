@@ -11,6 +11,4 @@ public interface TheatreRepo extends JpaRepository<TheatreModel,Integer> {
     Optional<TheatreModel> findByEmailAndPassword(String email, String password);
 
     List<TheatreModel> findByTheatreId(Integer theatreId);
-
-    Optional<TheatreModel> findByEmail(String email);
 }

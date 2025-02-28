@@ -16,6 +16,9 @@ public class ShowTimeModel {
     @Column(name = "showtimeId")
     private Integer showtimeId;
 
+    @Column(name = "dateId")
+    private Integer dateId;
+
     @Column(name = "showStart")
     private LocalTime showStart;
 
@@ -30,6 +33,14 @@ public class ShowTimeModel {
 
     public void setShowtimeId(Integer showtimeId) {
         this.showtimeId = showtimeId;
+    }
+
+    public Integer getDateId() {
+        return dateId;
+    }
+
+    public void setDateId(Integer dateId) {
+        this.dateId = dateId;
     }
 
     public LocalTime getShowStart() {
