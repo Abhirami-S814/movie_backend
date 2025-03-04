@@ -45,16 +45,22 @@ public class UserService {
     //user Login
 
     public ResponseEntity<?> userlogin(UserLoginDto userLoginDto) {
-        Optional<UserModel> optionalUserModel = userRepo.findByEmailAndPassword(userLoginDto.getEmail(),
-                                                                        userLoginDto.getPassword());
-
-        if (optionalUserModel.isPresent()){
-            return new ResponseEntity<>("Login Successfully",HttpStatus.OK);
+        if (userLoginDto.getEmail() == null || userLoginDto.getPassword() == null ||
+                userLoginDto.getEmail().isEmpty() || userLoginDto.getPassword().isEmpty()) {
+            return new ResponseEntity<>("Email or password is missing", HttpStatus.BAD_REQUEST);
         }
-        else {
-            return new ResponseEntity<>("Login failed",HttpStatus.BAD_REQUEST);
+
+        Optional<UserModel> optionalUserModel = userRepo.findByEmailAndPassword(userLoginDto.getEmail(),
+                userLoginDto.getPassword());
+
+        if (optionalUserModel.isPresent()) {
+            return new ResponseEntity<>("Login Successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Authentication failed", HttpStatus.BAD_REQUEST);
         }
     }
+
+
 
     //Search movie by user
     public ResponseEntity<List<MovieModel>> searchmovie(String movieName) {
