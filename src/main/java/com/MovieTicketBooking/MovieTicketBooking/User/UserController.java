@@ -54,9 +54,9 @@ public class UserController {
 
     //forgot password
     @PutMapping(path = "/resetpasswordUser")
-    public ResponseEntity<?> restpass(@RequestParam String email,@RequestParam String password){
+    public ResponseEntity<?> restpass(@RequestBody UserLoginDto userLoginDto){
         try{
-            return userService.resetuserpassword(email,password);
+            return userService.resetuserpassword(userLoginDto);
         } catch (Exception e) {
             e.printStackTrace();
         }

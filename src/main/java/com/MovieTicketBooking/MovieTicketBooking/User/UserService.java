@@ -74,11 +74,11 @@ public class UserService {
         return new ResponseEntity<>(movieModels,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> resetuserpassword(String email,String password) {
-        Optional<UserModel> optionalUserModel = userRepo.findByEmail(email);
+    public ResponseEntity<?> resetuserpassword(UserLoginDto userLoginDto) {
+        Optional<UserModel> optionalUserModel = userRepo.findByEmail(userLoginDto.getEmail());
         if (optionalUserModel.isPresent()){
             UserModel userModel = optionalUserModel.get();
-            userModel.setPassword(password);
+            userModel.setPassword(userLoginDto.getPassword());
             userRepo.save(userModel);
             return new ResponseEntity<>(userModel,HttpStatus.OK);
         }
