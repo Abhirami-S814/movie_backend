@@ -11,4 +11,5 @@ public interface MovieRepo extends JpaRepository<MovieModel,Integer> {
     List<MovieModel> findByMovieNameContainingIgnoreCase(String movieName);
 
     Optional<MovieModel> findByMovieId(Integer movieId);
+
 }

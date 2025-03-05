@@ -19,6 +19,9 @@ public class TheatreScreenModel {
     @Column(name = "screenName")
     private String screenName;
 
+    @Column(name = "seatCapacity")
+    private Long seatCapacity;
+
     @Column(name = "theatreId")
     private Integer theatreId;
 
@@ -47,5 +50,11 @@ public class TheatreScreenModel {
         this.theatreId = theatreId;
     }
 
+    public Long getSeatCapacity() {
+        return seatCapacity;
+    }
 
+    public void setSeatCapacity(Long seatCapacity) {
+        this.seatCapacity = seatCapacity;
+    }
 }

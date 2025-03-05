@@ -398,6 +398,7 @@ public class TheatreService {
 
             TheatreScreenModel newScreen = new TheatreScreenModel();
             newScreen.setScreenName(theatreScreenModel.getScreenName());
+            newScreen.setSeatCapacity(theatreScreenModel.getSeatCapacity());
             newScreen.setTheatreId(theatreId);
             theatreScreenModels.add(newScreen);
 
@@ -416,9 +417,35 @@ public class TheatreService {
     }
 
 
-    public ResponseEntity<List<TheatreScreenModel>> getallScreen(Integer theatreId) {
-        List<TheatreScreenModel> theatreScreenModels = theatreScreenRepo.findByTheatreId(theatreId);
-        return new ResponseEntity<>(theatreScreenModels,HttpStatus.OK);
+    public List<TheatreScreenMovDTO> getScreensByTheatreId(Integer theatreId) {
+        List<TheatreScreenModel> screens = theatreScreenRepo.findByTheatreId(theatreId);
+        List<TheatreScreenMovDTO> responseList = new ArrayList<>();
+
+        Optional<TheatreModel> optionalTheatreModel = theatreRepo.findById(theatreId);
+        String theatrename = optionalTheatreModel.get().getName();
+
+        for (TheatreScreenModel screen : screens) {
+            TheatreScreenMovDTO dto = new TheatreScreenMovDTO();
+            dto.setTheatreId(screen.getTheatreId());
+            dto.setName(theatrename);
+            dto.setScreenId(screen.getScreenId());
+            dto.setScreenName(screen.getScreenName());
+
+            // Fetch the movie associated with this screen if available
+            Optional<MovieModel> movieOptional = movieRepo.findById(screen.getScreenId());
+            if (movieOptional.isPresent()) {
+                MovieModel movie = movieOptional.get();
+                dto.setMovieId(movie.getMovieId());
+                dto.setMovieName(movie.getMovieName());
+            } else {
+                dto.setMovieId(null);
+                dto.setMovieName("No Movie Assigned");
+            }
+
+            responseList.add(dto);
+        }
+
+        return responseList;
     }
 
 
@@ -523,31 +550,31 @@ public class TheatreService {
     }
 
 
+    public ResponseEntity<?> addMovieToScreen(Integer theatreId, Integer screenId, Integer movieId) {
+        Optional<TheatreScreenModel> screenOpt = theatreScreenRepo.findById(screenId);
 
-    public TheatreScreenMovDTO addmovtoScreen(Integer theatreId, Integer screenId, Integer movieId) {
-        TheatreScreenModel screen = theatreScreenRepo.findById(screenId)
-                .orElseThrow(() -> new RuntimeException("Screen not found"));
+        // ✅ Check if screen exists and belongs to the given theatre
+        if (screenOpt.isPresent() && screenOpt.get().getTheatreId().equals(theatreId)) {
+            Optional<MovieModel> movieOpt = movieRepo.findById(movieId);
 
-        // Validate theatre ID matches
-        if (!screen.getTheatreId().equals(theatreId)) {
-            throw new RuntimeException("Screen does not belong to the given theatre");
+            // ✅ Check if movie exists
+            if (movieOpt.isPresent()) {
+                TheatreScreenModel screen = screenOpt.get();
+                MovieModel movie = movieOpt.get();
+
+                // ✅ Create response DTO with correct field names
+                TheatreScreenMovDTO responseDto = new TheatreScreenMovDTO();
+                responseDto.setTheatreId(theatreId);
+                responseDto.setName("PVR Cinemas"); // Hardcoded for now; Ideally fetched from DB
+                responseDto.setScreenId(screenId);
+                responseDto.setScreenName(screen.getScreenName());
+                responseDto.setMovieId(movieId);
+                responseDto.setMovieName(movie.getMovieName());
+
+                return new ResponseEntity<>(responseDto, HttpStatus.OK);
+            }
+            return new ResponseEntity<>("Movie not found", HttpStatus.BAD_REQUEST);
         }
-
-        // Check if the movie exists
-        MovieModel movie = movieRepo.findById(movieId)
-                .orElseThrow(() -> new RuntimeException("Movie not found"));
-
-
-
-        // Populate and return DTO
-        TheatreScreenMovDTO dto = new TheatreScreenMovDTO();
-        dto.setTheatreId(theatreId);
-        dto.setName("Theatre Name"); // Replace with actual theatre name if available
-        dto.setScreenId(screen.getScreenId());
-        dto.setScreenName(screen.getScreenName());
-        dto.setMovieId(movie.getMovieId());
-        dto.setMovieName(movie.getMovieName());
-
-        return dto;
+        return new ResponseEntity<>("Screen not found in theatre", HttpStatus.BAD_REQUEST);
     }
 }

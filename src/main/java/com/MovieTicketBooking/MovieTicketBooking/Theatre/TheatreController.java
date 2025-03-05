@@ -246,23 +246,25 @@ public class TheatreController {
     }
 
     // Get all theatre screens
-    @GetMapping("/getallscreens")
-    public ResponseEntity<List<TheatreScreenModel>> getScreen(@RequestParam Integer theatreId) {
-        return theatreService.getallScreen(theatreId);
+    @GetMapping("/getallmoviescreens")
+    public List<TheatreScreenMovDTO> getScreensByTheatreId(@RequestParam Integer theatreId) {
+        return theatreService.getScreensByTheatreId(theatreId);
     }
 
     //ADD MOVIE TO SCREEN OF A THEATRE IF THE SCREEN PRESENT
 
-//    @PostMapping("/addmoviesToscreen")
-//    public TheatreScreenMovDTO addScreenMov(@RequestParam Integer theatreId, @RequestParam Integer screenId,
-//                                            @RequestParam Integer movieId){
-//        try {
-//            return theatreService.addmovtoScreen(theatreId,screenId,movieId);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+    @PostMapping("/addmovietoscreen")
+    public ResponseEntity<?> addMovieToScreen(@RequestParam Integer theatreId,
+                                              @RequestParam Integer screenId,
+                                              @RequestParam Integer movieId) {
+        try {
+            return theatreService.addMovieToScreen(theatreId, screenId, movieId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     //-------------------------------------------------------------------------------------------------
 
