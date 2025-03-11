@@ -1,14 +1,25 @@
 package com.MovieTicketBooking.MovieTicketBooking.TheatreScreen;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 public class TheatreScreenMovDTO {
 
     private Integer theatreId;
-    private String name;
+    private String name; // Theatre Name
     private Integer screenId;
     private String screenName;
     private Integer movieId;
     private String movieName;
+    private Long seatCapacity;
+    private Integer dateId;
+    private LocalDate movStart;
+    private LocalDate movEnd;
+    private Integer showTimeId;
+    private LocalTime showStart;
+    private LocalTime showEnd;
 
+    // Getters and Setters
     public Integer getTheatreId() {
         return theatreId;
     }
@@ -55,5 +66,61 @@ public class TheatreScreenMovDTO {
 
     public void setMovieName(String movieName) {
         this.movieName = movieName;
+    }
+
+    public Long getSeatCapacity() {
+        return seatCapacity;
+    }
+
+    public void setSeatCapacity(Long seatCapacity) {
+        this.seatCapacity = seatCapacity;
+    }
+
+    public Integer getDateId() {
+        return dateId;
+    }
+
+    public void setDateId(Integer dateId) {
+        this.dateId = dateId;
+    }
+
+    public LocalDate getMovStart() {
+        return movStart;
+    }
+
+    public void setMovStart(LocalDate movStart) {
+        this.movStart = movStart;
+    }
+
+    public LocalDate getMovEnd() {
+        return movEnd;
+    }
+
+    public void setMovEnd(LocalDate movEnd) {
+        this.movEnd = movEnd;
+    }
+
+    public Integer getShowTimeId() {
+        return showTimeId;
+    }
+
+    public void setShowTimeId(Integer showTimeId) {
+        this.showTimeId = showTimeId;
+    }
+
+    public LocalTime getShowStart() {
+        return showStart;
+    }
+
+    public void setShowStart(LocalTime showStart) {
+        this.showStart = showStart;
+    }
+
+    public LocalTime getShowEnd() {
+        return showEnd;
+    }
+
+    public void setShowEnd(LocalTime showEnd) {
+        this.showEnd = showEnd;
     }
 }

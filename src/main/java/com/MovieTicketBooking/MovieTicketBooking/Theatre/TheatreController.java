@@ -363,8 +363,20 @@ public class TheatreController {
 
     //get all showtimes of particular theatre
     @GetMapping("/getshow")
-    public ResponseEntity<List<ShowTimeDto>> getshow(@RequestParam Integer theatreId) {
+    public ResponseEntity<List<TheatreScreenMovDTO>> getshow(@RequestParam Integer theatreId) {
         return theatreService.getTheatreshow(theatreId);
+    }
+
+    //datesssssss
+    @GetMapping("/showtimes")
+    public List<MovieDatesDto> getMoviesWithShowtimes(
+            @RequestParam(value = "date", required = false) LocalDate date) {
+
+        if (date == null) {
+            date = LocalDate.now();
+        }
+
+        return theatreService.getMoviesWithShowtimes(date);
     }
 
 }

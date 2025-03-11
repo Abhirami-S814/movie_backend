@@ -27,14 +27,18 @@ public class AdminController {
     }
 
     //admin login
-    @PostMapping(path = "/adminlogin")
-    public ResponseEntity<?> login(@RequestBody AdminLoginDto adminLoginDto){
+    @PostMapping("/adminlogin")
+    public ResponseEntity<?> login(@RequestBody AdminLoginDto adminLoginDto) {
         try {
-            return adminService.adminlogin(adminLoginDto);
+            boolean isAuthenticated = adminService.adminLogin(adminLoginDto);
+            if (isAuthenticated) {
+                return ResponseEntity.ok("Login successful");
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong, please try again.");
         }
-        return new ResponseEntity<>("Something went wrong",HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 

@@ -27,6 +27,7 @@ public class ShowTimeModel {
 
     private Integer theatreId;
 
+
     public Integer getShowtimeId() {
         return showtimeId;
     }
@@ -66,4 +67,6 @@ public class ShowTimeModel {
     public void setTheatreId(Integer theatreId) {
         this.theatreId = theatreId;
     }
+
+
 }

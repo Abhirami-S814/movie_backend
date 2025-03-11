@@ -263,27 +263,64 @@ public class TheatreService {
     }
 
 
-    public ResponseEntity<List<ShowTimeDto>> getTheatreshow(Integer theatreId) {
+    public ResponseEntity<List<TheatreScreenMovDTO>> getTheatreshow(Integer theatreId) {
         List<ShowTimeModel> showTimes = showTimeRepo.findByTheatreId(theatreId);
-        List<ShowTimeDto> showTimeDtoList = new ArrayList<>();
+        List<TheatreScreenMovDTO> dtoList = new ArrayList<>();
 
         for (ShowTimeModel showTime : showTimes) {
-            ShowTimeDto showTimeDto = new ShowTimeDto();
-            showTimeDto.setShowTimeId(showTime.getShowtimeId());
-            showTimeDto.setShowStart(showTime.getShowStart());
-            showTimeDto.setShowEnd(showTime.getShowEnd());
-            showTimeDto.setTheatreId(theatreId);
+            TheatreScreenMovDTO dto = new TheatreScreenMovDTO();
+
+            // Set ShowTime Details
+            dto.setShowTimeId(showTime.getShowtimeId());
+            dto.setShowStart(showTime.getShowStart());
+            dto.setShowEnd(showTime.getShowEnd());
+
+            // Set Theatre Details
             TheatreModel theatre = theatreRepo.findById(theatreId).orElse(null);
             if (theatre != null) {
-                showTimeDto.setTheatreId(theatre.getTheatreId());
-                showTimeDto.setName(theatre.getName());
+                dto.setTheatreId(theatre.getTheatreId());
+                dto.setName(theatre.getName());
             }
 
-            showTimeDtoList.add(showTimeDto);
+            // Fetch Movie Details from MovieDatesModel
+            Integer dateId = showTime.getDateId();
+            if (dateId != null) {
+                MovieDatesModel movieDatesModel = movieDatesRepo.findById(dateId).orElse(null);
+                if (movieDatesModel != null) {
+                    dto.setDateId(movieDatesModel.getDateId());
+                    dto.setMovStart(movieDatesModel.getMovStart());
+                    dto.setMovEnd(movieDatesModel.getMovEnd());
+
+                    // Fetch Movie Details using movieId
+                    Integer movieId = movieDatesModel.getMovieId(); // Ensure MovieDatesModel has movieId
+                    if (movieId != null) {
+                        MovieModel movie = movieRepo.findById(movieId).orElse(null);
+                        if (movie != null) {
+                            dto.setMovieId(movie.getMovieId());
+                            dto.setMovieName(movie.getMovieName());
+                        }
+                    }
+                }
+            }
+
+            // Fetch Screen Details using Theatre ID
+            List<TheatreScreenModel> screens = theatreScreenRepo.findByTheatreId(theatreId);
+            if (!screens.isEmpty()) {
+                TheatreScreenModel screen = screens.get(0); // Assuming first screen for simplicity
+                dto.setScreenId(screen.getScreenId());
+                dto.setScreenName(screen.getScreenName());
+                dto.setSeatCapacity(screen.getSeatCapacity());
+            }
+
+            dtoList.add(dto);
         }
 
-        return new ResponseEntity<>(showTimeDtoList,HttpStatus.OK);
+        return new ResponseEntity<>(dtoList, HttpStatus.OK);
     }
+
+
+
+
 
     public ResponseEntity<?> addcate(TicketCategoryModel ticketCategoryModel) {
         TicketCategoryModel ticketCategoryModel1 = new TicketCategoryModel();
@@ -431,7 +468,6 @@ public class TheatreService {
             dto.setScreenId(screen.getScreenId());
             dto.setScreenName(screen.getScreenName());
 
-            // Fetch the movie associated with this screen if available
             Optional<MovieModel> movieOptional = movieRepo.findById(screen.getScreenId());
             if (movieOptional.isPresent()) {
                 MovieModel movie = movieOptional.get();
@@ -513,10 +549,9 @@ public class TheatreService {
     public ResponseEntity<List<MovieDatesDto>> getallshowdate(Integer theatreId) {
         LocalDate today = LocalDate.now();
 
-        // Fetch movie dates by theatreId and screenId
+
         List<MovieDatesModel> movieDatesList = movieDatesRepo.findByTheatreId(theatreId);
 
-        // Filter out movies whose `movEnd` is before today
         List<MovieDatesModel> validMovieDates = movieDatesList.stream()
                 .filter(movieDate -> !movieDate.getMovEnd().isBefore(today))
                 .collect(Collectors.toList());
@@ -534,13 +569,13 @@ public class TheatreService {
             dto.setMovStart(movieDate.getMovStart());
             dto.setMovEnd(movieDate.getMovEnd());
 
-            // Fetch Theatre Details
+
             theatreRepo.findById(movieDate.getTheatreId()).ifPresent(theatre -> dto.setName(theatre.getName()));
 
-            // Fetch Screen Details
+
             theatreScreenRepo.findById(movieDate.getScreenId()).ifPresent(screen -> dto.setScreenName(screen.getScreenName()));
 
-            // Fetch Movie Details
+
             movieRepo.findById(movieDate.getMovieId()).ifPresent(movie -> dto.setMovieName(movie.getMovieName()));
 
             return dto;
@@ -553,20 +588,16 @@ public class TheatreService {
     public ResponseEntity<?> addMovieToScreen(Integer theatreId, Integer screenId, Integer movieId) {
         Optional<TheatreScreenModel> screenOpt = theatreScreenRepo.findById(screenId);
 
-        // ✅ Check if screen exists and belongs to the given theatre
         if (screenOpt.isPresent() && screenOpt.get().getTheatreId().equals(theatreId)) {
             Optional<MovieModel> movieOpt = movieRepo.findById(movieId);
 
-            // ✅ Check if movie exists
             if (movieOpt.isPresent()) {
                 TheatreScreenModel screen = screenOpt.get();
                 MovieModel movie = movieOpt.get();
 
-                // ✅ Create response DTO with correct field names
                 TheatreScreenMovDTO responseDto = new TheatreScreenMovDTO();
                 responseDto.setTheatreId(theatreId);
-                responseDto.setName("PVR Cinemas"); // Hardcoded for now; Ideally fetched from DB
-                responseDto.setScreenId(screenId);
+                //responseDto.setName("PVR Cinemas");
                 responseDto.setScreenName(screen.getScreenName());
                 responseDto.setMovieId(movieId);
                 responseDto.setMovieName(movie.getMovieName());
@@ -576,5 +607,32 @@ public class TheatreService {
             return new ResponseEntity<>("Movie not found", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("Screen not found in theatre", HttpStatus.BAD_REQUEST);
+    }
+
+    public List<MovieDatesDto> getMoviesWithShowtimes(LocalDate date) {
+        List<MovieDatesModel> movieDates = movieDatesRepo.findByMovStartLessThanEqualAndMovEndGreaterThanEqual(date, date);
+        List<MovieDatesDto> movieDatesDtoList = new ArrayList<>();
+
+        for (MovieDatesModel model : movieDates) {
+            MovieDatesDto dto = new MovieDatesDto();
+            dto.setDateId(model.getDateId());
+            dto.setTheatreId(model.getTheatreId());
+            dto.setScreenId(model.getScreenId());
+            dto.setMovieId(model.getMovieId());
+            dto.setMovStart(model.getMovStart());
+            dto.setMovEnd(model.getMovEnd());
+            Optional<TheatreModel> theatre = theatreRepo.findById(model.getTheatreId());
+            dto.setName(theatre.isPresent() ? theatre.get().getName() : "Unknown Theatre");
+
+            Optional<TheatreScreenModel> screen = theatreScreenRepo.findById(model.getScreenId());
+            dto.setScreenName(screen.isPresent() ? screen.get().getScreenName() : "Unknown Screen");
+
+            Optional<MovieModel> movie = movieRepo.findById(model.getMovieId());
+            dto.setMovieName(movie.isPresent() ? movie.get().getMovieName() : "Unknown Movie");
+
+            movieDatesDtoList.add(dto);
+        }
+
+        return movieDatesDtoList;
     }
 }

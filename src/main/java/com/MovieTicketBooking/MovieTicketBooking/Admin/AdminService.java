@@ -32,15 +32,11 @@ public class AdminService {
 
 
     // admin login
-    public ResponseEntity<?> adminlogin(AdminLoginDto adminLoginDto) {
-        Optional<AdminModel> optionalAdminModel = adminRepo.findByEmailAndPassword(adminLoginDto.getEmail(),
-                                                adminLoginDto.getPassword());
-        if (optionalAdminModel.isPresent()){
-            return new ResponseEntity<>("Login Successfully",HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>("Login failed",HttpStatus.BAD_REQUEST);
-        }
+    private static final String ADMIN_EMAIL = "admin@example.com";
+    private static final String ADMIN_PASSWORD = "admin123";
+
+    public boolean adminLogin(AdminLoginDto adminLoginDto) {
+        return ADMIN_EMAIL.equals(adminLoginDto.getEmail()) && ADMIN_PASSWORD.equals(adminLoginDto.getPassword());
     }
 
     //Add movies
