@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -40,7 +42,7 @@ public class AdminService {
     }
 
     //Add movies
-    public ResponseEntity<?> addmovies(MovieModel movieModel) {
+    public ResponseEntity<?> addmovies(MovieModel movieModel, MultipartFile movieposter) throws IOException {
         MovieModel movieModel1 = new MovieModel();
         movieModel1.setMovieName(movieModel.getMovieName());
         movieModel1.setLanguage(movieModel.getLanguage());
@@ -48,6 +50,7 @@ public class AdminService {
         movieModel1.setDuration(movieModel.getDuration());
         movieModel1.setDescription(movieModel.getDescription());
         movieModel1.setReleaseDate(movieModel.getReleaseDate());
+        movieModel1.setMovieposter(movieposter.getBytes());
 
         movieRepo.save(movieModel1);
         return new ResponseEntity<>(movieModel1,HttpStatus.OK);

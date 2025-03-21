@@ -22,6 +22,11 @@ public class MovieModel {
     @Column(name = "genre")
     private Integer genre;
 
+    @Lob
+    @Column(name = "movieposter")
+    private byte[] movieposter;
+
+
     @Column(name = "description")
     private String description;
 
@@ -62,6 +67,14 @@ public class MovieModel {
 
     public void setGenre(Integer genre) {
         this.genre = genre;
+    }
+
+    public byte[] getMovieposter() {
+        return movieposter;
+    }
+
+    public void setMovieposter(byte[] movieposter) {
+        this.movieposter = movieposter;
     }
 
     public String getDescription() {
