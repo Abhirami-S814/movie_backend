@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(path = "/api/admindetails")
@@ -44,9 +45,10 @@ public class AdminController {
 
     //Add movie by admin
     @PostMapping(path = "/addMovie")
-    public ResponseEntity<?> addMovie(@RequestBody MovieModel movieModel){
+    public ResponseEntity<?> addMovie(@RequestPart MovieModel movieModel,
+                                      @RequestPart MultipartFile movieposter){
         try{
-            return adminService.addmovies(movieModel);
+            return adminService.addmovies(movieModel,movieposter);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -9,6 +9,8 @@ import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreRepo;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangrepo;
+import com.MovieTicketBooking.MovieTicketBooking.SeatAvailability.SeatAvailabilityModel;
+import com.MovieTicketBooking.MovieTicketBooking.SeatAvailability.SeatAvailabilityRepo;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeDto;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeModel;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeRepo;
@@ -61,6 +63,9 @@ public class TheatreService {
 
     @Autowired
     MovieDatesRepo movieDatesRepo;
+
+    @Autowired
+    SeatAvailabilityRepo seatAvailabilityRepo;
 
     public ResponseEntity<?> addtheatre(TheatreModel theatreModel) {
         TheatreModel theatreModel1 = new TheatreModel();
@@ -634,5 +639,14 @@ public class TheatreService {
         }
 
         return movieDatesDtoList;
+    }
+
+
+    public SeatAvailabilityModel availableseats(Integer screenId) {
+            TheatreScreenModel theatreScreenModel = theatreScreenRepo.findById(screenId)
+                    .orElseThrow(() -> new RuntimeException("Screen not found"));
+
+        SeatAvailabilityModel seatAvailability = new SeatAvailabilityModel(screenId, theatreScreenModel.getSeatCapacity());
+            return seatAvailabilityRepo.save(seatAvailability);
     }
 }

@@ -5,6 +5,7 @@ import com.MovieTicketBooking.MovieTicketBooking.MovieDates.MovieDatesDto;
 import com.MovieTicketBooking.MovieTicketBooking.MovieDates.MovieDatesModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangModel;
+import com.MovieTicketBooking.MovieTicketBooking.SeatAvailability.SeatAvailabilityModel;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeDto;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenModel;
@@ -377,6 +378,12 @@ public class TheatreController {
         }
 
         return theatreService.getMoviesWithShowtimes(date);
+    }
+
+    //seat availability
+    @PostMapping("/availableseats")
+    public ResponseEntity<SeatAvailabilityModel> addSeats(@RequestParam Integer screenId) {
+        return ResponseEntity.ok(theatreService.availableseats(screenId));
     }
 
 }
