@@ -18,7 +18,7 @@ public class SeatAvailabilityModel {
     @Column(name = "totalSeats", nullable = false)
     private Integer totalSeats;
 
-    @Column(name = "availablSeats", nullable = false)
+    @Column(name = "availableSeats", nullable = false)
     private Integer availableSeats;
 
     public SeatAvailabilityModel(Long screenId, Integer totalSeats) {
@@ -27,8 +27,6 @@ public class SeatAvailabilityModel {
         this.availableSeats = totalSeats; // Initially all seats are available
     }
 
-    public SeatAvailabilityModel(Integer screenId, Long seatCapacity) {
-    }
 
     public void bookSeats(int seatsToBook) {
         if (availableSeats >= seatsToBook) {
