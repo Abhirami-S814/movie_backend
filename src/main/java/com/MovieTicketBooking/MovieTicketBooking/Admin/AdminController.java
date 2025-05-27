@@ -2,11 +2,15 @@ package com.MovieTicketBooking.MovieTicketBooking.Admin;
 
 
 import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieModel;
+import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreModel;
+import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/admindetails")
@@ -97,6 +101,80 @@ public class AdminController {
             e.printStackTrace();
         }
         return new ResponseEntity<>("Something went wrong",HttpStatus.OK);
+    }
+
+
+    //add movie languages
+    @PostMapping(path = "/addlang")
+    public ResponseEntity<?> addlang(@RequestBody MovieLangModel movieLangModel) {
+        return adminService.addlang(movieLangModel);
+    }
+
+    //delete movie language
+    @DeleteMapping(path = "/deletelang")
+    public ResponseEntity<?> deletelang(@RequestParam Integer langId) {
+        try {
+            return adminService.deletelang(langId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    //Update movie language
+    @PutMapping(path = "/updatelang")
+    public ResponseEntity<?> updatelang(@RequestParam Integer langId, @RequestParam String langName) {
+        try {
+            return adminService.updatelang(langId, langName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    //get all movie languages
+    @GetMapping(path = "/getallang")
+    public ResponseEntity<List<MovieLangModel>> allang() {
+        return adminService.allang();
+    }
+
+    //add movie genre
+    @PostMapping(path = "/addgenre")
+    public ResponseEntity<?> addgenre(@RequestBody MovieGenreModel movieGenreModel) {
+        try {
+            return adminService.addgenre(movieGenreModel);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    //delete movie genre
+    @DeleteMapping(path = "/deletegenre")
+    public ResponseEntity<?> deletegenre(@RequestParam Integer genreId) {
+        try {
+            return adminService.deletegenre(genreId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    //update movie genre
+    @PutMapping(path = "/updategenre")
+    public ResponseEntity<?> updategenre(@RequestParam Integer genreId, @RequestParam String genreName) {
+        try {
+            return adminService.updategenre(genreId, genreName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    //get all genres
+    @GetMapping(path = "/getgenre")
+    public ResponseEntity<List<MovieGenreModel>> getgenre() {
+        return adminService.getgenre();
     }
 
 }

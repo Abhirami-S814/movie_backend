@@ -1,4 +1,4 @@
-package com.MovieTicketBooking.MovieTicketBooking.TheatreEmail;
+package com.MovieTicketBooking.MovieTicketBooking.MovieLang.TheatreEmail;
 
 
 import jakarta.persistence.*;

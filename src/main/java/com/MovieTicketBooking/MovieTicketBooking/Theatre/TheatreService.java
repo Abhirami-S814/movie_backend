@@ -9,11 +9,11 @@ import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreRepo;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangrepo;
-import com.MovieTicketBooking.MovieTicketBooking.SeatAvailability.SeatAvailabilityModel;
 import com.MovieTicketBooking.MovieTicketBooking.SeatAvailability.SeatAvailabilityRepo;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeDto;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeModel;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeRepo;
+import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenMovDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenRepo;
@@ -26,12 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,15 +79,30 @@ public class TheatreService {
     }
 
     public ResponseEntity<?> theatrelogin(TheatreLoginDto theatreLoginDto) {
-        Optional<TheatreModel> optionalTheatreModel = theatreRepo.findByEmailAndPassword(theatreLoginDto.getEmail(),
-                theatreLoginDto.getPassword());
-            if (optionalTheatreModel.isPresent()){
-                return new ResponseEntity<>("Login successfully",HttpStatus.OK);
-            }
-            else{
-                return new ResponseEntity<>("Login failed",HttpStatus.BAD_REQUEST);
-            }
+        Optional<TheatreModel> optionalTheatreModel = theatreRepo.findByEmailAndPassword(
+                theatreLoginDto.getEmail(),
+                theatreLoginDto.getPassword()
+        );
+
+        if (optionalTheatreModel.isPresent()) {
+            TheatreModel theatre = optionalTheatreModel.get();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Login successful");
+            response.put("theatreId", theatre.getTheatreId()); // assuming getId() returns the primary key
+            response.put("name", theatre.getName());    // optionally send other info
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Invalid email or password");
+
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
     }
+
 
     public ResponseEntity<List<TheatreModel>> getalltheatres() {
         List<TheatreModel> theatreModels = theatreRepo.findAll();
@@ -98,85 +112,6 @@ public class TheatreService {
     public ResponseEntity<List<TheatreModel>> theatrebyid(Integer theatreId) {
         List<TheatreModel> theatreModels = theatreRepo.findByTheatreId(theatreId);
             return new ResponseEntity<>(theatreModels,HttpStatus.OK);
-    }
-
-    public ResponseEntity<?> addlang(MovieLangModel movieLangModel) {
-        MovieLangModel movieLangModel1 = new MovieLangModel();
-            movieLangModel1.setLangName(movieLangModel.getLangName());
-            movieLangrepo.save(movieLangModel1);
-            return new ResponseEntity<>(movieLangModel1,HttpStatus.OK);
-    }
-
-    public ResponseEntity<?> deletelang(Integer langId) {
-        Optional<MovieLangModel> optionalMovieLangModel = movieLangrepo.findById(langId);
-            if (optionalMovieLangModel.isPresent()){
-                MovieLangModel movieLangModel = optionalMovieLangModel.get();
-                movieLangrepo.delete(movieLangModel);
-                return new ResponseEntity<>("Language Deleted",HttpStatus.OK);
-            }
-            else {
-                return new ResponseEntity<>("Deleteion failed",HttpStatus.BAD_REQUEST);
-            }
-    }
-
-    public ResponseEntity<?> updatelang(Integer langId, String langName) {
-        Optional<MovieLangModel> optionalMovieLangModel = movieLangrepo.findById(langId);
-            if (optionalMovieLangModel.isPresent()){
-                MovieLangModel movieLangModel = optionalMovieLangModel.get();
-                movieLangModel.setLangName(langName);
-                movieLangrepo.save(movieLangModel);
-                return new ResponseEntity<>(movieLangModel,HttpStatus.OK);
-            }
-            else{
-                return new ResponseEntity<>("Language not found",HttpStatus.NOT_FOUND);
-            }
-    }
-
-    public ResponseEntity<List<MovieLangModel>> allang() {
-        List<MovieLangModel> movieLangModels = movieLangrepo.findAll();
-            return new ResponseEntity<>(movieLangModels,HttpStatus.OK);
-    }
-
-    public ResponseEntity<?> addgenre(MovieGenreModel movieGenreModel) {
-        MovieGenreModel movieGenreModel1 = new MovieGenreModel();
-            movieGenreModel1.setGenreName(movieGenreModel.getGenreName());
-            movieGenreRepo.save(movieGenreModel1);
-            return new ResponseEntity<>(movieGenreModel1,HttpStatus.OK);
-    }
-
-
-    public ResponseEntity<?> deletegenre(Integer genreId) {
-        Optional<MovieGenreModel> optionalMovieGenreModel = movieGenreRepo.findById(genreId);
-            if (optionalMovieGenreModel.isPresent()){
-                MovieGenreModel movieGenreModel = optionalMovieGenreModel.get();
-                movieGenreRepo.delete(movieGenreModel);
-                return new ResponseEntity<>("genre Deleted",HttpStatus.OK);
-            }
-            else {
-                return new ResponseEntity<>("Deleteion failed",HttpStatus.BAD_REQUEST);
-            }
-    }
-
-
-    public ResponseEntity<?> updategenre(Integer genreId, String genreName) {
-        Optional<MovieGenreModel> optionalMovieGenreModel = movieGenreRepo.findById(genreId);
-            if (optionalMovieGenreModel.isPresent()){
-                MovieGenreModel movieGenreModel = optionalMovieGenreModel.get();
-                movieGenreModel.setGenreName(genreName);
-                movieGenreRepo.save(movieGenreModel);
-                return new ResponseEntity<>(movieGenreModel,HttpStatus.OK);
-            }
-            return new ResponseEntity<>("Something went wrong",HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    public ResponseEntity<List<MovieGenreModel>> getgenre() {
-        try {
-            List<MovieGenreModel> movieGenreModels = movieGenreRepo.findAll();
-
-            return new ResponseEntity<>(movieGenreModels, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
 
@@ -489,7 +424,7 @@ public class TheatreService {
         return responseList;
     }
 
-
+    @Transactional
     public ResponseEntity<?> addshowDates(MovieDatesModel movieDatesModel) {
         LocalDate today = LocalDate.now(); // Get today's date
         LocalDate minStartDate = today.plusDays(1); // Earliest allowed start date (tomorrow)
@@ -642,11 +577,115 @@ public class TheatreService {
     }
 
 
-    public SeatAvailabilityModel availableseats(Integer screenId) {
-            TheatreScreenModel theatreScreenModel = theatreScreenRepo.findById(screenId)
-                    .orElseThrow(() -> new RuntimeException("Screen not found"));
 
-        SeatAvailabilityModel seatAvailability = new SeatAvailabilityModel(screenId, theatreScreenModel.getSeatCapacity());
-            return seatAvailabilityRepo.save(seatAvailability);
+
+
+    public ResponseEntity<String> updateScreenCount(Integer theatreId, Integer count) {
+        try {
+            Optional<TheatreModel> theatreOpt = theatreRepo.findById(theatreId);
+            if (theatreOpt.isPresent()) {
+                TheatreModel theatre = theatreOpt.get();
+                theatre.setNoOfScreens(count);
+                theatreRepo.save(theatre);
+                return ResponseEntity.ok("Screen count updated successfully.");
+            } else {
+                return ResponseEntity.status(404).body("Theatre not found.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
+        }
     }
+
+    public TheatreScreenModel addMovieScreen(Integer screenId, Integer movieId) throws Exception{
+        Optional<TheatreScreenModel> screenOpt = theatreScreenRepo.findById(screenId);
+        if (!screenOpt.isPresent()) {
+            throw new Exception("Screen with id " + screenId + " not found");
+        }
+
+        Optional<MovieModel> movieOpt = movieRepo.findById(movieId);
+        if (!movieOpt.isPresent()) {
+            throw new Exception("Movie with id " + movieId + " not found");
+        }
+
+        TheatreScreenModel screen = screenOpt.get();
+        screen.setMovie(movieOpt.get());
+
+        return theatreScreenRepo.save(screen);
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<TheatreScreenDTO>> getscreensDTO(Integer theatreId) {
+        try {
+            List<TheatreScreenModel> theatreScreens = theatreScreenRepo.findByTheatreId(theatreId);
+
+            List<TheatreScreenDTO> dtoList = theatreScreens.stream().map(screen -> {
+                TheatreScreenDTO dto = new TheatreScreenDTO();
+                dto.setScreenId(screen.getScreenId());
+                dto.setScreenName(screen.getScreenName());
+                dto.setSeatCapacity(screen.getSeatCapacity());
+                dto.setTheatreId(screen.getTheatreId());
+
+                // Avoid triggering lazy loading of LOBs by accessing only safe fields
+                if (screen.getMovie() != null) {
+                    dto.setMovieName(screen.getMovie().getMovieName()); // only safe fields
+                }
+
+                return dto;
+            }).collect(Collectors.toList());
+
+            return new ResponseEntity<>(dtoList, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace(); // or log
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Transactional
+    public ResponseEntity<List<TheatreScreenModel>> getScreensmov(Integer theatreId) {
+        List<TheatreScreenModel> theatreScreenModels = theatreScreenRepo.findByTheatreId(theatreId);
+        for (TheatreScreenModel screen : theatreScreenModels) {
+            System.out.println("Screen: " + screen.getScreenName());
+            if (screen.getMovie() != null) {
+                System.out.println("Movie Assigned: " + screen.getMovie().getMovieName());
+            } else {
+                System.out.println("No Movie Assigned");
+            }
+        }
+
+        return new ResponseEntity<>(theatreScreenModels,HttpStatus.OK);
+    }
+
+
+//    public TheatreScreenModel saveScreenWithMovie(TheatreScreenDTO dto) {
+//        TheatreScreenModel screen = new TheatreScreenModel();
+//
+//        // if screenId is provided, update existing screen
+//        if (dto.getScreenId() != null) {
+//            Optional<TheatreScreenModel> existing = theatreScreenRepo.findById(dto.getScreenId());
+//            if (existing.isPresent()) {
+//                screen = existing.get();
+//            }
+//        }
+//        screen.setScreenId(dto.getScreenId());
+//        screen.setScreenName(dto.getScreenName());
+//        screen.setSeatCapacity(dto.getSeatCapacity());
+//        screen.setTheatreId(dto.getTheatreId());
+//
+//        if (dto.getMovieId() != null) {
+//            Optional<MovieModel> movie = movieRepo.findById(dto.getMovieId());
+//            movie.ifPresent(screen::setMovie);
+//        }
+//
+//        return theatreScreenRepo.save(screen);
+//    }
+
+
+
+//    public SeatAvailabilityModel availableseats(Integer screenId) {
+//            TheatreScreenModel theatreScreenModel = theatreScreenRepo.findById(screenId)
+//                    .orElseThrow(() -> new RuntimeException("Screen not found"));
+//
+//        SeatAvailabilityModel seatAvailability = new SeatAvailabilityModel(screenId, theatreScreenModel.getSeatCapacity());
+//            return seatAvailabilityRepo.save(seatAvailability);
+//    }
 }

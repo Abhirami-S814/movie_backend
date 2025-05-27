@@ -1,5 +1,6 @@
 package com.MovieTicketBooking.MovieTicketBooking.Movie;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,6 +24,8 @@ public class MovieModel {
     private Integer genre;
 
     @Lob
+    @Basic(fetch = FetchType.EAGER)
+//    @JsonIgnore
     @Column(name = "movieposter")
     private byte[] movieposter;
 

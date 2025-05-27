@@ -3,6 +3,7 @@ package com.MovieTicketBooking.MovieTicketBooking.User;
 
 import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieModel;
 import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,6 +71,7 @@ public class UserController {
     }
 
     //Get all movies
+    @Transactional
     @GetMapping(path = "/getallmovies")
     public ResponseEntity<List<MovieModel>> allmovies(){
         return userService.getallmovies();

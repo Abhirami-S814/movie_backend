@@ -5,9 +5,9 @@ import com.MovieTicketBooking.MovieTicketBooking.MovieDates.MovieDatesDto;
 import com.MovieTicketBooking.MovieTicketBooking.MovieDates.MovieDatesModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangModel;
-import com.MovieTicketBooking.MovieTicketBooking.SeatAvailability.SeatAvailabilityModel;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeDto;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeModel;
+import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenMovDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCategory.TicketCategoryModel;
@@ -59,83 +59,12 @@ public class TheatreController {
     }
 
     //list theatres by id
-    @GetMapping(path = "/gettheathre")
+    @GetMapping(path = "/gettheatre")
     public ResponseEntity<List<TheatreModel>> theatrebyId(@RequestParam Integer theatreId) {
         return theatreService.theatrebyid(theatreId);
     }
 
-    //add movie languages
-    @PostMapping(path = "/addlang")
-    public ResponseEntity<?> addlang(@RequestBody MovieLangModel movieLangModel) {
-        return theatreService.addlang(movieLangModel);
-    }
 
-    //delete movie language
-    @DeleteMapping(path = "/deletelang")
-    public ResponseEntity<?> deletelang(@RequestParam Integer langId) {
-        try {
-            return theatreService.deletelang(langId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    //Update movie language
-    @PutMapping(path = "/updatelang")
-    public ResponseEntity<?> updatelang(@RequestParam Integer langId, @RequestParam String langName) {
-        try {
-            return theatreService.updatelang(langId, langName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    //get all movie languages
-    @GetMapping(path = "/getallang")
-    public ResponseEntity<List<MovieLangModel>> allang() {
-        return theatreService.allang();
-    }
-
-    //add movie genre
-    @PostMapping(path = "/addgenre")
-    public ResponseEntity<?> addgenre(@RequestBody MovieGenreModel movieGenreModel) {
-        try {
-            return theatreService.addgenre(movieGenreModel);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    //delete movie genre
-    @DeleteMapping(path = "/deletegenre")
-    public ResponseEntity<?> deletegenre(@RequestParam Integer genreId) {
-        try {
-            return theatreService.deletegenre(genreId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    //update movie genre
-    @PutMapping(path = "/updategenre")
-    public ResponseEntity<?> updategenre(@RequestParam Integer genreId, @RequestParam String genreName) {
-        try {
-            return theatreService.updategenre(genreId, genreName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    //get all genres
-    @GetMapping(path = "/getgenre")
-    public ResponseEntity<List<MovieGenreModel>> getgenre() {
-        return theatreService.getgenre();
-    }
 
     //-----------------------TICKET CATEGORY------------------------------------------------------------------
 
@@ -224,7 +153,7 @@ public class TheatreController {
 
     //------------------------------THEATRE SCREEN-------------------------------------------------
 
-    //Theatre add movie to each screen
+    //Theatre add  screen
     @PostMapping("/addscreenmov/{theatreId}")
     public ResponseEntity<?> addmovie(@PathVariable Integer theatreId,@RequestBody TheatreScreenModel theatreScreenModel){
         try{
@@ -246,25 +175,64 @@ public class TheatreController {
         return new ResponseEntity<>("Something went wrong",HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Get all theatre screens
+    //Get all screens with seat capacity
+    @GetMapping("/getscreens")
+    public ResponseEntity<List<TheatreScreenDTO>> getscreens(@RequestParam(required = true) Integer theatreId) {
+        if (theatreId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return theatreService.getscreensDTO(theatreId);
+    }
+
+    //if new screen is added the noOfScreens count need to increase
+    @PutMapping("/updatescreencount")
+    public ResponseEntity<String> updateScreenCount(
+            @RequestParam Integer theatreId,
+            @RequestParam Integer count) {
+        return theatreService.updateScreenCount(theatreId, count);
+    }
+
+
+    // Get all theatre screens with movie(now all is null)
     @GetMapping("/getallmoviescreens")
     public List<TheatreScreenMovDTO> getScreensByTheatreId(@RequestParam Integer theatreId) {
         return theatreService.getScreensByTheatreId(theatreId);
     }
 
+    @GetMapping("/getmovscreens")
+    public ResponseEntity<List<TheatreScreenModel>> getScreensmov(@RequestParam Integer theatreId) {
+        return theatreService.getScreensmov(theatreId);
+    }
+
     //ADD MOVIE TO SCREEN OF A THEATRE IF THE SCREEN PRESENT
 
-    @PostMapping("/addmovietoscreen")
-    public ResponseEntity<?> addMovieToScreen(@RequestParam Integer theatreId,
-                                              @RequestParam Integer screenId,
-                                              @RequestParam Integer movieId) {
+//    @PostMapping("/addmovietoscreen")
+//    public ResponseEntity<?> addMovieToScreen(@RequestParam Integer theatreId,
+//                                              @RequestParam Integer screenId,
+//                                              @RequestParam Integer movieId) {
+//        try {
+//            return theatreService.addMovieToScreen(theatreId, screenId, movieId);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
+
+    //Add MOVIE to SCREEN
+//    @PostMapping("/addmovie")
+//    public TheatreScreenModel addOrUpdateScreenWithMovie(@RequestBody TheatreScreenDTO dto) {
+//        return theatreService.saveScreenWithMovie(dto);
+//    }
+    @PostMapping("/addmovie")
+    public ResponseEntity<?> addMovieToScreen(@RequestParam Integer screenId, @RequestParam Integer movieId) {
         try {
-            return theatreService.addMovieToScreen(theatreId, screenId, movieId);
+            TheatreScreenModel updatedScreen = theatreService.addMovieScreen(screenId, movieId);
+            return ResponseEntity.ok(updatedScreen);
         } catch (Exception e) {
-            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
 
     //-------------------------------------------------------------------------------------------------
@@ -380,10 +348,10 @@ public class TheatreController {
         return theatreService.getMoviesWithShowtimes(date);
     }
 
-    //seat availability
-    @PostMapping("/availableseats")
-    public ResponseEntity<SeatAvailabilityModel> addSeats(@RequestParam Integer screenId) {
-        return ResponseEntity.ok(theatreService.availableseats(screenId));
-    }
+//    //seat availability
+//    @PostMapping("/availableseats")
+//    public ResponseEntity<SeatAvailabilityModel> addSeats(@RequestParam Integer screenId) {
+//        return ResponseEntity.ok(theatreService.availableseats(screenId));
+//    }
 
 }

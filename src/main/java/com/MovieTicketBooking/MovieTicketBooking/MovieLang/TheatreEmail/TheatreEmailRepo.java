@@ -1,4 +1,4 @@
-package com.MovieTicketBooking.MovieTicketBooking.TheatreEmail;
+package com.MovieTicketBooking.MovieTicketBooking.MovieLang.TheatreEmail;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

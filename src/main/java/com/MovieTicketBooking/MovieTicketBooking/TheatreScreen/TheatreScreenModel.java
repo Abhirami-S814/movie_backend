@@ -1,6 +1,7 @@
 package com.MovieTicketBooking.MovieTicketBooking.TheatreScreen;
 
 import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -24,6 +25,10 @@ public class TheatreScreenModel {
 
     @Column(name = "theatreId")
     private Integer theatreId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "movieId")
+    private MovieModel movie;
 
 
     public Integer getScreenId() {
@@ -57,4 +62,15 @@ public class TheatreScreenModel {
     public void setSeatCapacity(Long seatCapacity) {
         this.seatCapacity = seatCapacity;
     }
+
+    public MovieModel getMovie() {
+        return movie;
+    }
+
+    public void setMovie(MovieModel movie) {
+        this.movie = movie;
+    }
+
+//    public void setMovie(MovieModel movie) {
+//    }
 }
