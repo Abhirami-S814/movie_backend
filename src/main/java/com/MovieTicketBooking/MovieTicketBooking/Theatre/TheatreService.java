@@ -441,9 +441,17 @@ public class TheatreService {
             return new ResponseEntity<>("Movie end date cannot be in the past", HttpStatus.BAD_REQUEST);
         }
 
-        Optional<MovieDatesModel> latestMovie = movieDatesRepo.findTopByTheatreIdAndScreenIdOrderByMovEndDesc(
-                movieDatesModel.getTheatreId(), movieDatesModel.getScreenId()
+        // Check if show date already exists for this movie-screen-theatre with the same start date
+        boolean exists = movieDatesRepo.existsByMovieIdAndScreenIdAndTheatreId(
+                movieDatesModel.getMovieId(),
+                movieDatesModel.getScreenId(),
+                movieDatesModel.getTheatreId()
+
         );
+
+        if (exists) {
+            return new ResponseEntity<>("Show date already exists for this movie on this screen.", HttpStatus.CONFLICT);
+        }
 
         Optional<TheatreScreenModel> optionalTheatreScreenModel =
                 theatreScreenRepo.findByTheatreIdAndScreenId(movieDatesModel.getTheatreId(), movieDatesModel.getScreenId());
@@ -463,6 +471,7 @@ public class TheatreService {
 
         return new ResponseEntity<>("NOT FOUND", HttpStatus.NOT_FOUND);
     }
+
 
     public ResponseEntity<?> deleteshowdate(Integer dateId) {
         Optional<MovieDatesModel> optionalMovieDatesModel = movieDatesRepo.findById(dateId);
@@ -653,6 +662,48 @@ public class TheatreService {
         }
 
         return new ResponseEntity<>(theatreScreenModels,HttpStatus.OK);
+    }
+
+    public ResponseEntity<String> deletemovie(Integer screenId) {
+        Optional<TheatreScreenModel> optionalScreen = theatreScreenRepo.findById(screenId);
+
+        if (optionalScreen.isEmpty()) {
+            return new ResponseEntity<>("Screen not found", HttpStatus.NOT_FOUND);
+        }
+
+        TheatreScreenModel screen = optionalScreen.get();
+
+        // Remove the movie by setting to null
+        screen.setMovie(null);
+
+        theatreScreenRepo.save(screen);
+
+        return new ResponseEntity<>("Movie removed from screen successfully", HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> updatemovie(Integer movieId, Integer screenId) {
+        try {
+            // Check if screen exists
+            TheatreScreenModel screen = theatreScreenRepo.findById(screenId).orElse(null);
+            if (screen == null) {
+                return new ResponseEntity<>("Screen not found", HttpStatus.NOT_FOUND);
+            }
+
+            // Check if movie exists
+            MovieModel movie = movieRepo.findById(movieId).orElse(null);
+            if (movie == null) {
+                return new ResponseEntity<>("Movie not found", HttpStatus.NOT_FOUND);
+            }
+
+            // Set new movie to the screen
+            screen.setMovie(movie);
+            theatreScreenRepo.save(screen);
+
+            return new ResponseEntity<>(screen, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to update movie", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 

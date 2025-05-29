@@ -16,6 +16,7 @@ import com.MovieTicketBooking.MovieTicketBooking.TicketCharge.TicketChargeModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -165,6 +166,7 @@ public class TheatreController {
     }
 
     //Theatre Delete screen
+    @Transactional
     @DeleteMapping("/deletescreen")
     public ResponseEntity<?> deleteScreen(@RequestParam Integer theatreId,@RequestParam Integer screenId){
         try{
@@ -231,6 +233,27 @@ public class TheatreController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @DeleteMapping("/deletemovie")
+    public ResponseEntity<?> deleeteMovie(@RequestParam Integer screenId){
+        try{
+            return theatreService.deletemovie(screenId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong",HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @PutMapping("/updatemovie")
+    public ResponseEntity<?> updatecharge(@RequestParam Integer movieId,
+                                          @RequestParam Integer screenId) {
+        try {
+            return theatreService.updatemovie(movieId,screenId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
