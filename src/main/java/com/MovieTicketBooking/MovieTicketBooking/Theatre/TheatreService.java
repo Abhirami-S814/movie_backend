@@ -17,6 +17,8 @@ import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenMovDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenRepo;
+import com.MovieTicketBooking.MovieTicketBooking.TicketCateCharge.TicketCateChargeModel;
+import com.MovieTicketBooking.MovieTicketBooking.TicketCateCharge.TicketcateChargeRepo;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCategory.TicketCategoryModel;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCategory.TicketCategoryRepo;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCharge.TicketChargeDto;
@@ -28,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -65,6 +68,9 @@ public class TheatreService {
 
     @Autowired
     SeatAvailabilityRepo seatAvailabilityRepo;
+
+    @Autowired
+    TicketcateChargeRepo ticketcateChargeRepo;
 
     public ResponseEntity<?> addtheatre(TheatreModel theatreModel) {
         TheatreModel theatreModel1 = new TheatreModel();
@@ -122,21 +128,52 @@ public class TheatreService {
     }
 
 
+    @Transactional
     public ResponseEntity<?> addShowTime(ShowTimeModel showTimeModel) {
-        Integer theatreId = showTimeModel.getTheatreId();
+        try {
+            // Check if Theatre exists
+            Integer theatreId = showTimeModel.getTheatreId();
+            boolean theatreExists = checkTheatreExists(theatreId);
+            if (!theatreExists) {
+                return new ResponseEntity<>("Theatre not found", HttpStatus.NOT_FOUND);
+            }
 
-            TheatreModel theatreModel = theatreRepo.findById(theatreId)
-                    .orElseThrow(() -> new RuntimeException("Theatre not found with ID: " + theatreId));
+            // Fetch Movie and validate existence
+            Integer movieId = showTimeModel.getMovieId();
+            Optional<MovieModel> movieOpt = movieRepo.findByMovieId(movieId);
 
-            ShowTimeModel newShowTime = new ShowTimeModel();
-            newShowTime.setShowStart(showTimeModel.getShowStart());
-            newShowTime.setShowEnd(showTimeModel.getShowEnd());
-            newShowTime.setDateId(showTimeModel.getDateId());
-            newShowTime.setTheatreId(theatreId);
+            if (movieOpt.isEmpty()) {
+                return new ResponseEntity<>("Movie not found", HttpStatus.NOT_FOUND);
+            }
 
-            showTimeRepo.save(newShowTime);
+            MovieModel movie = movieOpt.get();
 
-            return new ResponseEntity<>(newShowTime, HttpStatus.CREATED);
+            // Get movie duration directly as LocalTime
+            LocalTime movieDurationTime = movie.getDuration(); // Already a LocalTime
+            Duration movieDuration = Duration.ofHours(movieDurationTime.getHour())
+                    .plusMinutes(movieDurationTime.getMinute())
+                    .plusSeconds(movieDurationTime.getSecond());
+
+            // Get and compare show time duration
+            LocalTime startTime = showTimeModel.getShowStart();
+            LocalTime endTime = showTimeModel.getShowEnd();
+
+            if (startTime == null || endTime == null) {
+                return new ResponseEntity<>("Show start and end time are required", HttpStatus.BAD_REQUEST);
+            }
+
+            Duration showDuration = Duration.between(startTime, endTime);
+            if (!showDuration.equals(movieDuration)) {
+                return new ResponseEntity<>("Show time duration does not match movie duration", HttpStatus.BAD_REQUEST);
+            }
+
+            showTimeRepo.save(showTimeModel);
+            return new ResponseEntity<>(showTimeModel, HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Something went wrong while adding show time", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public ResponseEntity<?> deleteShow(Integer theatreId, Integer showtimeId) {
@@ -262,38 +299,51 @@ public class TheatreService {
 
 
 
-    public ResponseEntity<?> addcate(TicketCategoryModel ticketCategoryModel) {
-        TicketCategoryModel ticketCategoryModel1 = new TicketCategoryModel();
-        ticketCategoryModel1.setTicketCate(ticketCategoryModel.getTicketCate());
-        ticketCategoryRepo.save(ticketCategoryModel1);
-        return new ResponseEntity<>(ticketCategoryModel1,HttpStatus.OK);
+    public ResponseEntity<?> addcate(TicketCateChargeModel ticketCateChargeModel, Integer theatreId) {
+        try {
+            // Check if theatre exists
+            if (!theatreRepo.existsById(theatreId)) {
+                return new ResponseEntity<>("Theatre not found with ID: " + theatreId, HttpStatus.NOT_FOUND);
+            }
+
+            // Set theatreId
+            ticketCateChargeModel.setTheatreId(theatreId);
+
+            // Save ticket category charge
+            TicketCateChargeModel savedModel = ticketcateChargeRepo.save(ticketCateChargeModel);
+
+            return new ResponseEntity<>(savedModel, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to add ticket category charge", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
-    public ResponseEntity<?> deletecate(Integer ticketCateId) {
-    Optional<TicketCategoryModel> optionalTicketCategoryModel = ticketCategoryRepo.findById(ticketCateId);
-    if (optionalTicketCategoryModel.isPresent()){
-            TicketCategoryModel ticketCategoryModel = optionalTicketCategoryModel.get();
-            ticketCategoryRepo.delete(ticketCategoryModel);
+    public ResponseEntity<?> deletecate(Integer ticketcatechargeId) {
+    Optional<TicketCateChargeModel> optionalTicketCateChargeModel = ticketcateChargeRepo.findById(ticketcatechargeId);
+    if (optionalTicketCateChargeModel.isPresent()){
+            TicketCateChargeModel ticketCateChargeModel = optionalTicketCateChargeModel.get();
+            ticketcateChargeRepo.delete(ticketCateChargeModel);
             return new ResponseEntity<>("Ticket category deleted successfully",HttpStatus.OK);
         }
         return new ResponseEntity<>("Category not found",HttpStatus.NOT_FOUND);
     }
 
-    public ResponseEntity<?> updatecate(Integer ticketCateId,String ticketCate) {
-        Optional<TicketCategoryModel> optionalTicketCategoryModel = ticketCategoryRepo.findById(ticketCateId);
-        if (optionalTicketCategoryModel.isPresent()){
-            TicketCategoryModel ticketCategoryModel = optionalTicketCategoryModel.get();
-            ticketCategoryModel.setTicketCate(ticketCate);
-            ticketCategoryRepo.save(ticketCategoryModel);
+    public ResponseEntity<?> updatecate(Integer ticketcatechargeId,Long ticketcharge) {
+        Optional<TicketCateChargeModel> optionalTicketCateChargeModel = ticketcateChargeRepo.findById(ticketcatechargeId);
+        if (optionalTicketCateChargeModel.isPresent()){
+            TicketCateChargeModel ticketCateChargeModel = optionalTicketCateChargeModel.get();
+            ticketCateChargeModel.setTicketcharge(ticketcharge);
+            ticketcateChargeRepo.save(ticketCateChargeModel);
             return new ResponseEntity<>("Ticket category updated successfully",HttpStatus.OK);
         }
         return new ResponseEntity<>("Category not found",HttpStatus.NOT_FOUND);
     }
 
-    public ResponseEntity<List<TicketCategoryModel>> getcate() {
-        List<TicketCategoryModel> ticketCategoryModels = ticketCategoryRepo.findAll();
-        return new ResponseEntity<>(ticketCategoryModels,HttpStatus.OK);
+    public ResponseEntity<List<TicketCateChargeModel>> getcate() {
+        List<TicketCateChargeModel> ticketCateChargeModels = ticketcateChargeRepo.findAll();
+        return new ResponseEntity<>(ticketCateChargeModels,HttpStatus.OK);
     }
 
     public ResponseEntity<?> addcharge(TicketChargeModel ticketChargeModel) {
@@ -426,47 +476,49 @@ public class TheatreService {
 
     @Transactional
     public ResponseEntity<?> addshowDates(MovieDatesModel movieDatesModel) {
-        LocalDate today = LocalDate.now(); // Get today's date
-        LocalDate minStartDate = today.plusDays(1); // Earliest allowed start date (tomorrow)
-        LocalDate maxStartDate = today.plusDays(5); // Latest allowed start date (within 5 days)
+        LocalDate today = LocalDate.now();
         LocalDate movStartDate = movieDatesModel.getMovStart();
         LocalDate movEndDate = movieDatesModel.getMovEnd();
 
-        // Validation: movStart should be within 1 to 5 days from today
-        if (movStartDate.isBefore(minStartDate) || movStartDate.isAfter(maxStartDate)) {
-            return new ResponseEntity<>("Movie start date must be within the next 5 days", HttpStatus.BAD_REQUEST);
-        }
-        // Validation: movEnd should not be in the past
+        // 🔍 Print all incoming data
+        System.out.println("Received MovieDatesModel: " + movieDatesModel);
+
+        // ✅ Validation: End date should not be in the past
         if (movEndDate.isBefore(today)) {
             return new ResponseEntity<>("Movie end date cannot be in the past", HttpStatus.BAD_REQUEST);
         }
 
-        // Check if show date already exists for this movie-screen-theatre with the same start date
+        // ✅ Check for existing show date
         boolean exists = movieDatesRepo.existsByMovieIdAndScreenIdAndTheatreId(
                 movieDatesModel.getMovieId(),
                 movieDatesModel.getScreenId(),
                 movieDatesModel.getTheatreId()
-
         );
 
         if (exists) {
             return new ResponseEntity<>("Show date already exists for this movie on this screen.", HttpStatus.CONFLICT);
         }
 
+        // ✅ Fetch movie and screen
         Optional<TheatreScreenModel> optionalTheatreScreenModel =
                 theatreScreenRepo.findByTheatreIdAndScreenId(movieDatesModel.getTheatreId(), movieDatesModel.getScreenId());
         Optional<MovieModel> optionalMovieModel = movieRepo.findByMovieId(movieDatesModel.getMovieId());
 
         if (optionalTheatreScreenModel.isPresent() && optionalMovieModel.isPresent()) {
-            MovieDatesModel movieDatesModel1 = new MovieDatesModel();
-            movieDatesModel1.setMovStart(movieDatesModel.getMovStart());
-            movieDatesModel1.setMovEnd(movieDatesModel.getMovEnd());
-            movieDatesModel1.setScreenId(movieDatesModel.getScreenId());
-            movieDatesModel1.setMovieId(movieDatesModel.getMovieId());
-            movieDatesModel1.setTheatreId(movieDatesModel.getTheatreId());
+            MovieModel movie = optionalMovieModel.get();
+            LocalDate releaseDate = movie.getReleaseDate();
 
-            movieDatesRepo.save(movieDatesModel1);
-            return new ResponseEntity<>(movieDatesModel1, HttpStatus.OK);
+            // ✅ Validate movStart is on or within 3 days after release date
+            if (movStartDate.isBefore(releaseDate) || movStartDate.isAfter(releaseDate.plusDays(3))) {
+                return new ResponseEntity<>(
+                        "Movie start date must be on or within 3 days after the release date",
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+
+            // ✅ Save the model
+            movieDatesRepo.save(movieDatesModel);
+            return new ResponseEntity<>(movieDatesModel, HttpStatus.OK);
         }
 
         return new ResponseEntity<>("NOT FOUND", HttpStatus.NOT_FOUND);
@@ -705,6 +757,13 @@ public class TheatreService {
             return new ResponseEntity<>("Failed to update movie", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public ResponseEntity<List<TicketCateChargeModel>> catebytheatre(Integer theatreId) {
+        List<TicketCateChargeModel> ticketCateChargeModels = ticketcateChargeRepo.findByTheatreId(theatreId);
+        return new ResponseEntity<>(ticketCateChargeModels,HttpStatus.OK);
+    }
+
+
 
 
 //    public TheatreScreenModel saveScreenWithMovie(TheatreScreenDTO dto) {

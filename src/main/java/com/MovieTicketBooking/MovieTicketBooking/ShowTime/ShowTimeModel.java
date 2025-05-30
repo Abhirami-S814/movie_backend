@@ -27,6 +27,8 @@ public class ShowTimeModel {
 
     private Integer theatreId;
 
+    private Integer movieId;
+
 
     public Integer getShowtimeId() {
         return showtimeId;
@@ -68,6 +70,11 @@ public class ShowTimeModel {
         this.theatreId = theatreId;
     }
 
+    public Integer getMovieId() {
+        return movieId;
+    }
 
-
+    public void setMovieId(Integer movieId) {
+        this.movieId = movieId;
+    }
 }

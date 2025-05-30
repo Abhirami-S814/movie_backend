@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Entity
 @Table(name = "movieTbl")
 @Data
@@ -34,10 +37,10 @@ public class MovieModel {
     private String description;
 
     @Column(name = "duration")
-    private String duration;
+    private LocalTime duration;
 
     @Column(name = "releaseDate")
-    private String releaseDate;
+    private LocalDate releaseDate;
 
 
     public Integer getMovieId() {
@@ -88,19 +91,19 @@ public class MovieModel {
         this.description = description;
     }
 
-    public String getDuration() {
+    public LocalTime getDuration() {
         return duration;
     }
 
-    public void setDuration(String duration) {
+    public void setDuration(LocalTime duration) {
         this.duration = duration;
     }
 
-    public String getReleaseDate() {
+    public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(String releaseDate) {
+    public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
 

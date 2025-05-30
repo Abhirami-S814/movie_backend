@@ -10,6 +10,7 @@ import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenMovDTO;
+import com.MovieTicketBooking.MovieTicketBooking.TicketCateCharge.TicketCateChargeModel;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCategory.TicketCategoryModel;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCharge.TicketChargeDto;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCharge.TicketChargeModel;
@@ -71,9 +72,10 @@ public class TheatreController {
 
     //Add ticket category
     @PostMapping("/addcate")
-    public ResponseEntity<?> addcate(@RequestBody TicketCategoryModel ticketCategoryModel) {
+    public ResponseEntity<?> addcate(@RequestBody TicketCateChargeModel ticketCateChargeModel,
+                                     @RequestParam Integer theatreId) {
         try {
-            return theatreService.addcate(ticketCategoryModel);
+            return theatreService.addcate(ticketCateChargeModel,theatreId);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -82,9 +84,9 @@ public class TheatreController {
 
     //remove ticket category
     @DeleteMapping("/deletecate")
-    public ResponseEntity<?> deltecate(@RequestParam Integer ticketCateId) {
+    public ResponseEntity<?> deltecate(@RequestParam Integer ticketcatechargeId) {
         try {
-            return theatreService.deletecate(ticketCateId);
+            return theatreService.deletecate(ticketcatechargeId);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -93,10 +95,10 @@ public class TheatreController {
 
     //update ticket category
     @PutMapping("/updatecate")
-    public ResponseEntity<?> updatecate(@RequestParam Integer ticketCateId,
-                                        @RequestParam String ticketCate) {
+    public ResponseEntity<?> updatecate(@RequestParam Integer ticketcatechargeId,
+                                        @RequestParam Long ticketcharge) {
         try {
-            return theatreService.updatecate(ticketCateId,ticketCate);
+            return theatreService.updatecate(ticketcatechargeId,ticketcharge);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -105,51 +107,14 @@ public class TheatreController {
 
     //Get all categories
     @GetMapping("/getcate")
-    public ResponseEntity<List<TicketCategoryModel>> getcate() {
+    public ResponseEntity<List<TicketCateChargeModel>> getcate() {
         return theatreService.getcate();
     }
 
-    //----------------------------------------TICKET CHARGE--------------------------------------------------
-
-    //Add ticket charge
-    @PostMapping("/addcharge")
-    public ResponseEntity<?> addcharge(@RequestBody TicketChargeModel ticketChargeModel) {
-        try {
-            return theatreService.addcharge(ticketChargeModel);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    //delete charge
-    @DeleteMapping("/deletecharge")
-    public ResponseEntity<?> deletecharge(@RequestParam Integer ticketCateId,
-                                          @RequestParam Integer theatreId) {
-        try {
-            return theatreService.deletecharge(ticketCateId, theatreId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>("Something  went wrong", HttpStatus.OK);
-    }
-
-    //update ticket charge
-    @PutMapping("/updatecharge")
-    public ResponseEntity<?> updatecharge(@RequestParam Integer ticketCateId,
-                                          @RequestParam Integer theatreId, @RequestParam Long charge) {
-        try {
-            return theatreService.updatecharge(ticketCateId, theatreId, charge);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    //get ticket charge of each theatre
-    @GetMapping("/getcharge")
-    public ResponseEntity<List<TicketChargeDto>> getchargedetails(@RequestParam Integer theatreId){
-        return theatreService.getchargedetails(theatreId);
+    //get category by theatre
+    @GetMapping(path = "/gettheatrecate")
+    public ResponseEntity<List<TicketCateChargeModel>> catetheatre(@RequestParam Integer theatreId) {
+        return theatreService.catebytheatre(theatreId);
     }
 
     //------------------------------THEATRE SCREEN-------------------------------------------------
