@@ -20,4 +20,10 @@ public interface ShowTimeRepo extends JpaRepository<ShowTimeModel, Integer> {
     Optional<ShowTimeModel> findByTheatreIdAndShowtimeIdAndDateId(Integer theatreId, Integer showtimeId, Integer dateId);
 
     Optional<ShowTimeModel> findByTheatreIdAndShowtimeId(Integer theatreId, Integer showtimeId);
+
+    Optional<ShowTimeModel> findByMovieIdAndTheatreId(Integer movieId, Integer theatreId);
+
+    List<ShowTimeModel> findByScreenId(Integer screenId);
+
+    List<ShowTimeModel> findAllByMovieIdAndTheatreId(Integer movieId, Integer theatreId);
 }

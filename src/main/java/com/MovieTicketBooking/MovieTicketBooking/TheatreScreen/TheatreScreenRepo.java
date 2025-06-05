@@ -10,5 +10,8 @@ public interface TheatreScreenRepo extends JpaRepository<TheatreScreenModel,Inte
 
     Optional<TheatreScreenModel> findByTheatreIdAndScreenId(Integer theatreId, Integer screenId);
 
-    TheatreScreenMovDTO findByScreenId(Integer screenId);
+
+    List<TheatreScreenModel> findByMovie_MovieId(Integer movieId);
+
+    List<TheatreScreenModel> findByScreenId(Integer screenId);
 }

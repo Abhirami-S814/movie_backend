@@ -3,6 +3,9 @@ package com.MovieTicketBooking.MovieTicketBooking.User;
 
 import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieModel;
 import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieRepo;
+import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenMovDTO;
+import com.MovieTicketBooking.MovieTicketBooking.TicketBooking.BookingRequestDTO;
+import com.MovieTicketBooking.MovieTicketBooking.TicketBooking.TicketBookingModel;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,6 +44,11 @@ public class UserController {
         return new ResponseEntity<>("email available",HttpStatus.OK);
     }
 
+    @GetMapping("/getuser")
+    public ResponseEntity<String> getuser(@RequestParam Integer userId) {
+        return userService.getUser(userId);
+    }
+
 
     //user login
     @PostMapping(path = "/userlogin")
@@ -70,6 +78,11 @@ public class UserController {
         return userService.searchmovie(movieName);
     }
 
+    @GetMapping(path = "/getmovie")
+    public ResponseEntity<List<MovieModel>> search(@RequestParam Integer movieId) {
+        return userService.getmovie(movieId);
+    }
+
     //Get all movies
     @Transactional
     @GetMapping(path = "/getallmovies")
@@ -77,6 +90,25 @@ public class UserController {
         return userService.getallmovies();
     }
 
-    
+    //get all details when movieid is passed
+
+
+    @GetMapping("/getmovietheatre")
+    public List<TheatreScreenMovDTO> getScreensByMovieId(@RequestParam Integer movieId) {
+        return userService.getTheatreScreensByMovieId(movieId);
+    }
+
+    @PostMapping("/bookticket")
+    public ResponseEntity<TicketBookingModel> bookTicket(@RequestBody TicketBookingModel booking) {
+        TicketBookingModel savedBooking = userService.bookTicket(booking);
+        return ResponseEntity.ok(savedBooking);
+    }
+
+//    @PostMapping("/bookingreq")
+//    public ResponseEntity<TicketBookingModel> createBooking(@RequestBody BookingRequestDTO bookingRequestDTO) {
+//        TicketBookingModel savedBooking = userService.createBooking(bookingRequestDTO);
+//        return ResponseEntity.ok(savedBooking);
+//    }
+
 
 }

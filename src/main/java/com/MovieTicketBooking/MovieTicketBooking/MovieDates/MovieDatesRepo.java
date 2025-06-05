@@ -18,4 +18,6 @@ public interface MovieDatesRepo extends JpaRepository<MovieDatesModel,Integer> {
     List<MovieDatesModel> findByMovStartLessThanEqualAndMovEndGreaterThanEqual(LocalDate date, LocalDate date1);
 
     boolean existsByMovieIdAndScreenIdAndTheatreId(Integer movieId, Integer screenId, Integer theatreId);
+
+    Optional<MovieDatesModel> findByScreenId(Integer screenId);
 }

@@ -22,8 +22,7 @@ public class ShowTimeModel {
     @Column(name = "showStart")
     private LocalTime showStart;
 
-    @Column(name = "showEnd")
-    private LocalTime showEnd;
+    private Integer screenId;
 
     private Integer theatreId;
 
@@ -54,13 +53,7 @@ public class ShowTimeModel {
         this.showStart = showStart;
     }
 
-    public LocalTime getShowEnd() {
-        return showEnd;
-    }
 
-    public void setShowEnd(LocalTime showEnd) {
-        this.showEnd = showEnd;
-    }
 
     public Integer getTheatreId() {
         return theatreId;
@@ -76,5 +69,13 @@ public class ShowTimeModel {
 
     public void setMovieId(Integer movieId) {
         this.movieId = movieId;
+    }
+
+    public Integer getScreenId() {
+        return screenId;
+    }
+
+    public void setScreenId(Integer screenId) {
+        this.screenId = screenId;
     }
 }

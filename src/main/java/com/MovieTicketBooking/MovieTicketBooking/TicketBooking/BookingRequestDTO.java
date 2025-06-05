@@ -1,62 +1,26 @@
 package com.MovieTicketBooking.MovieTicketBooking.TicketBooking;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
-import lombok.Data;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-@Entity
-@Table(name = "TicketbookingTbl")
-@Data
-public class TicketBookingModel {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer bookingId;
+public class BookingRequestDTO {
 
     private Integer userId;
-    private String userName;
-
     private Integer movieId;
     private String movieName;
-
     private Integer theatreId;
     private String theatreName;
-
     private Integer screenId;
     private String screenName;
-
     private LocalDate showDate;
     private LocalTime showTime;
-
-    private Long totalBeforeTax;
-    private Double taxPercentage;
-    private Double taxAmount;
-    private Double totalWithTax;
 
     private Long seatCapacityBeforeBooking;
     private Long seatCapacityAfterBooking;
 
 
-    @Column(name = "bookingDateTime")
-    private LocalDateTime bookingDateTime;
-
-
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<TicketCategoryBookingModel> categoryBookings;
-
-
-    public Integer getBookingId() {
-        return bookingId;
-    }
-
-    public void setBookingId(Integer bookingId) {
-        this.bookingId = bookingId;
-    }
+    private List<CategoryBooking> categoryBookings;
 
     public Integer getUserId() {
         return userId;
@@ -64,14 +28,6 @@ public class TicketBookingModel {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public Integer getMovieId() {
@@ -138,46 +94,6 @@ public class TicketBookingModel {
         this.showTime = showTime;
     }
 
-    public Long getTotalBeforeTax() {
-        return totalBeforeTax;
-    }
-
-    public void setTotalBeforeTax(Long totalBeforeTax) {
-        this.totalBeforeTax = totalBeforeTax;
-    }
-
-    public Double getTaxPercentage() {
-        return taxPercentage;
-    }
-
-    public void setTaxPercentage(Double taxPercentage) {
-        this.taxPercentage = taxPercentage;
-    }
-
-    public Double getTaxAmount() {
-        return taxAmount;
-    }
-
-    public void setTaxAmount(Double taxAmount) {
-        this.taxAmount = taxAmount;
-    }
-
-    public Double getTotalWithTax() {
-        return totalWithTax;
-    }
-
-    public void setTotalWithTax(Double totalWithTax) {
-        this.totalWithTax = totalWithTax;
-    }
-
-    public List<TicketCategoryBookingModel> getCategoryBookings() {
-        return categoryBookings;
-    }
-
-    public void setCategoryBookings(List<TicketCategoryBookingModel> categoryBookings) {
-        this.categoryBookings = categoryBookings;
-    }
-
     public Long getSeatCapacityBeforeBooking() {
         return seatCapacityBeforeBooking;
     }
@@ -194,11 +110,11 @@ public class TicketBookingModel {
         this.seatCapacityAfterBooking = seatCapacityAfterBooking;
     }
 
-    public LocalDateTime getBookingDateTime() {
-        return bookingDateTime;
+    public List<CategoryBooking> getCategoryBookings() {
+        return categoryBookings;
     }
 
-    public void setBookingDateTime(LocalDateTime bookingDateTime) {
-        this.bookingDateTime = bookingDateTime;
+    public void setCategoryBookings(List<CategoryBooking> categoryBookings) {
+        this.categoryBookings = categoryBookings;
     }
 }

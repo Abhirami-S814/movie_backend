@@ -1,7 +1,11 @@
 package com.MovieTicketBooking.MovieTicketBooking.TheatreScreen;
 
+import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowDTO;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TheatreScreenMovDTO {
 
@@ -12,12 +16,11 @@ public class TheatreScreenMovDTO {
     private Integer movieId;
     private String movieName;
     private Long seatCapacity;
+    private Integer availableSeats;
     private Integer dateId;
     private LocalDate movStart;
     private LocalDate movEnd;
-    private Integer showTimeId;
-    private LocalTime showStart;
-    private LocalTime showEnd;
+    private List<ShowDTO> showTimes = new ArrayList<>();
 
     // Getters and Setters
     public Integer getTheatreId() {
@@ -76,6 +79,14 @@ public class TheatreScreenMovDTO {
         this.seatCapacity = seatCapacity;
     }
 
+    public Integer getAvailableSeats() {
+        return availableSeats;
+    }
+
+    public void setAvailableSeats(Integer availableSeats) {
+        this.availableSeats = availableSeats;
+    }
+
     public Integer getDateId() {
         return dateId;
     }
@@ -100,27 +111,12 @@ public class TheatreScreenMovDTO {
         this.movEnd = movEnd;
     }
 
-    public Integer getShowTimeId() {
-        return showTimeId;
+
+    public List<ShowDTO> getShowTimes() {
+        return showTimes;
     }
 
-    public void setShowTimeId(Integer showTimeId) {
-        this.showTimeId = showTimeId;
-    }
-
-    public LocalTime getShowStart() {
-        return showStart;
-    }
-
-    public void setShowStart(LocalTime showStart) {
-        this.showStart = showStart;
-    }
-
-    public LocalTime getShowEnd() {
-        return showEnd;
-    }
-
-    public void setShowEnd(LocalTime showEnd) {
-        this.showEnd = showEnd;
+    public void setShowTimes(List<ShowDTO> showTimes) {
+        this.showTimes = showTimes;
     }
 }

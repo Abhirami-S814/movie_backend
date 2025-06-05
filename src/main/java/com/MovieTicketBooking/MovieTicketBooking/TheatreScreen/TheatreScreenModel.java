@@ -23,6 +23,8 @@ public class TheatreScreenModel {
     @Column(name = "seatCapacity")
     private Long seatCapacity;
 
+    private Long availableSeats;
+
     @Column(name = "theatreId")
     private Integer theatreId;
 

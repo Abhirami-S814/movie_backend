@@ -28,8 +28,11 @@ public class TheatreModel {
     private String password;
 
 
-    @Column(name = "location")
-    private String location;
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
 
     @Column(name = "noOfScreens")
     private Integer noOfScreens;
@@ -62,12 +65,20 @@ public class TheatreModel {
         this.email = email;
     }
 
-    public String getLocation() {
-        return location;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public String getPassword() {

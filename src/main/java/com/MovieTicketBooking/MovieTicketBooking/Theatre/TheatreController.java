@@ -10,6 +10,7 @@ import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenMovDTO;
+import com.MovieTicketBooking.MovieTicketBooking.TheatreTax.TheatreTaxModel;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCateCharge.TicketCateChargeModel;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCategory.TicketCategoryModel;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCharge.TicketChargeDto;
@@ -165,6 +166,12 @@ public class TheatreController {
     public List<TheatreScreenMovDTO> getScreensByTheatreId(@RequestParam Integer theatreId) {
         return theatreService.getScreensByTheatreId(theatreId);
     }
+//
+//    @GetMapping("/getTheatresByMovie")
+//    public ResponseEntity<List<TheatreScreenMovDTO>> getTheatresByMovie(@RequestParam Integer movieId) {
+//        List<TheatreScreenMovDTO> result = theatreService.getTheatreMovieDetails(movieId);
+//        return ResponseEntity.ok(result);
+//    }
 
     @GetMapping("/getmovscreens")
     public ResponseEntity<List<TheatreScreenModel>> getScreensmov(@RequestParam Integer theatreId) {
@@ -321,8 +328,16 @@ public class TheatreController {
     //get all showtimes of particular theatre
     @GetMapping("/getshow")
     public ResponseEntity<List<TheatreScreenMovDTO>> getshow(@RequestParam Integer theatreId) {
-        return theatreService.getTheatreshow(theatreId);
+        List<TheatreScreenMovDTO> result = theatreService.getTheatreshow(theatreId);
+        return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/getshowScreen")
+    public ResponseEntity<List<TheatreScreenMovDTO>> getshowscreen(@RequestParam Integer screenId) {
+        List<TheatreScreenMovDTO> result = theatreService.getScreenshow(screenId);
+        return ResponseEntity.ok(result);
+    }
+
 
     //datesssssss
     @GetMapping("/showtimes")
@@ -341,5 +356,18 @@ public class TheatreController {
 //    public ResponseEntity<SeatAvailabilityModel> addSeats(@RequestParam Integer screenId) {
 //        return ResponseEntity.ok(theatreService.availableseats(screenId));
 //    }
+
+
+
+    @PostMapping("/addtx")
+    public ResponseEntity<?> addcate(@RequestBody TheatreTaxModel theatreTaxModel,
+                                     @RequestParam Integer theatreId) {
+        try {
+            return theatreService.addtax(theatreTaxModel,theatreId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
 }
