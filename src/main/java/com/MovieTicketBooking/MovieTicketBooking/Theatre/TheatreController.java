@@ -370,4 +370,35 @@ public class TheatreController {
         return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @GetMapping("/gettax")
+    public ResponseEntity<?> getTheatreTax(@RequestParam Integer theatreId) {
+        try {
+            return theatreService.getTheatreTax(theatreId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/updatetx")
+    public ResponseEntity<?> updateTax(@RequestBody TheatreTaxModel theatreTaxModel,
+                                       @RequestParam Integer theatreId) {
+        try {
+            return theatreService.updateTax(theatreTaxModel, theatreId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/deletetx")
+    public ResponseEntity<?> deleteTax(@RequestParam Integer theatreId) {
+        try {
+            return theatreService.deleteTax(theatreId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

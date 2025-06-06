@@ -24,7 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -140,10 +142,20 @@ public class UserService {
 
             Integer theatreId = screen.getTheatreId();
             Optional<TheatreModel> optionalTheatreModel = theatreRepo.findById(theatreId);
-            String theatreName = optionalTheatreModel.map(TheatreModel::getName).orElse("Unknown Theatre");
 
-            dto.setTheatreId(theatreId);
-            dto.setName(theatreName);
+            if (optionalTheatreModel.isPresent()) {
+                TheatreModel theatre = optionalTheatreModel.get();
+                dto.setTheatreId(theatreId);
+                dto.setName(theatre.getName());
+                dto.setLatitude(theatre.getLatitude());   // ← Add latitude
+                dto.setLongitude(theatre.getLongitude()); // ← Add longitude
+            } else {
+                dto.setTheatreId(theatreId);
+                dto.setName("Unknown Theatre");
+                dto.setLatitude(null);
+                dto.setLongitude(null);
+            }
+
             dto.setScreenId(screen.getScreenId());
             dto.setScreenName(screen.getScreenName());
             dto.setSeatCapacity(screen.getSeatCapacity());
@@ -167,9 +179,9 @@ public class UserService {
                 stDto.setShowStart(showTime.getShowStart());
                 return stDto;
             }).collect(Collectors.toList());
+
             dto.setShowTimes(showTimeDTOs);
 
-            // NEW: Calculate booked seats and available seats
             int availableSeats = screen.getAvailableSeats() != null
                     ? screen.getAvailableSeats().intValue()
                     : screen.getSeatCapacity().intValue();
@@ -262,6 +274,36 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("User not found");
         }
+    }
+
+    public AvailableSeatsDTO getAvailableSeats(Integer screenId, LocalDate showDate, LocalTime showTime) {
+        Optional<TheatreScreenModel> screenOpt = theatreScreenRepo.findById(screenId);
+        if (!screenOpt.isPresent()) {
+            throw new RuntimeException("Screen not found with ID: " + screenId);
+        }
+
+        TheatreScreenModel screen = screenOpt.get();
+        Long totalSeats = screen.getSeatCapacity();
+
+        // Get all bookings for the screen at the specified date and time
+        List<TicketBookingModel> bookings = ticketBookingRepo
+                .findByScreenIdAndShowDateAndShowTime(screenId, showDate, showTime);
+
+        // Sum up all booked seats from category bookings
+        int bookedSeats = bookings.stream()
+                .flatMap(b -> b.getCategoryBookings().stream())
+                .mapToInt(TicketCategoryBookingModel::getQuantity)
+                .sum();
+
+        Long availableSeats = totalSeats - bookedSeats;
+
+        return new AvailableSeatsDTO(
+                screen.getScreenId(),
+                screen.getScreenName(),
+                showDate,
+                showTime,
+                availableSeats
+        );
     }
 
 //    public void createBooking(BookingRequestDTO bookingRequestDTO) {

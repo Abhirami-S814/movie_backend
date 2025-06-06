@@ -810,6 +810,75 @@ public class TheatreService {
         }
     }
 
+    public ResponseEntity<?> getTheatreTax(Integer theatreId) {
+        try {
+            Optional<TheatreTaxModel> taxModelOptional = theatreTaxRepo.findByTheatreId(theatreId);
+
+            if (taxModelOptional.isPresent()) {
+                return new ResponseEntity<>(taxModelOptional.get(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("No tax data found for the theatre", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Error retrieving tax data", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> updateTax(TheatreTaxModel theatreTaxModel, Integer theatreId) {
+        try {
+            // Check if theatre exists
+            if (!theatreRepo.existsById(theatreId)) {
+                return new ResponseEntity<>("Theatre not found with ID: " + theatreId, HttpStatus.NOT_FOUND);
+            }
+
+            // Check if tax record exists for the theatre
+            Optional<TheatreTaxModel> existingTaxModel = theatreTaxRepo.findByTheatreId(theatreId);
+
+            if (!existingTaxModel.isPresent()) {
+                return new ResponseEntity<>("No tax data found for the theatre", HttpStatus.NOT_FOUND);
+            }
+
+            // Update the tax record
+            TheatreTaxModel updatedTaxModel = existingTaxModel.get();
+            updatedTaxModel.setTaxPercentage(theatreTaxModel.getTaxPercentage());
+
+            // Save the updated tax data
+            TheatreTaxModel updatedTax = theatreTaxRepo.save(updatedTaxModel);
+
+            return new ResponseEntity<>(updatedTax, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to update the tax", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> deleteTax(Integer theatreId) {
+        try {
+            // Check if theatre exists
+            if (!theatreRepo.existsById(theatreId)) {
+                return new ResponseEntity<>("Theatre not found with ID: " + theatreId, HttpStatus.NOT_FOUND);
+            }
+
+            // Check if tax record exists for the theatre
+            Optional<TheatreTaxModel> existingTaxModel = theatreTaxRepo.findByTheatreId(theatreId);
+
+            if (!existingTaxModel.isPresent()) {
+                return new ResponseEntity<>("No tax data found for the theatre", HttpStatus.NOT_FOUND);
+            }
+
+            // Delete the tax record
+            theatreTaxRepo.delete(existingTaxModel.get());
+
+            return new ResponseEntity<>("Tax data deleted successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to delete the tax", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
     @Transactional
     public List<TheatreScreenMovDTO> getScreenshow(Integer screenId) {
         List<TheatreScreenModel> screens = theatreScreenRepo.findByScreenId(screenId);

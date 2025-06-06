@@ -4,6 +4,7 @@ package com.MovieTicketBooking.MovieTicketBooking.User;
 import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieModel;
 import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieRepo;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenMovDTO;
+import com.MovieTicketBooking.MovieTicketBooking.TicketBooking.AvailableSeatsDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TicketBooking.BookingRequestDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TicketBooking.TicketBookingModel;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -111,4 +114,15 @@ public class UserController {
 //    }
 
 
+    @GetMapping("/getAvailableSeats")
+    public ResponseEntity<AvailableSeatsDTO> getAvailableSeats(
+            @RequestParam Integer screenId,
+            @RequestParam LocalDate showDate,
+            @RequestParam LocalTime showTime
+    ) {
+
+
+        AvailableSeatsDTO dto = userService.getAvailableSeats(screenId, showDate, showTime);
+        return ResponseEntity.ok(dto);
+    }
 }

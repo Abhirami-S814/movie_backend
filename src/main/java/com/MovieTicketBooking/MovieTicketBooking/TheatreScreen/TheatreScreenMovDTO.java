@@ -20,6 +20,10 @@ public class TheatreScreenMovDTO {
     private Integer dateId;
     private LocalDate movStart;
     private LocalDate movEnd;
+
+    private Double latitude;
+    private Double longitude;
+
     private List<ShowDTO> showTimes = new ArrayList<>();
 
     // Getters and Setters
@@ -111,6 +115,21 @@ public class TheatreScreenMovDTO {
         this.movEnd = movEnd;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
 
     public List<ShowDTO> getShowTimes() {
         return showTimes;
