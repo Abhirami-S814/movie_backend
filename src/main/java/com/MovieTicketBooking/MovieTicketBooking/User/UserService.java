@@ -182,11 +182,11 @@ public class UserService {
 
             dto.setShowTimes(showTimeDTOs);
 
-            int availableSeats = screen.getAvailableSeats() != null
+            long availableSeats = screen.getAvailableSeats() != null
                     ? screen.getAvailableSeats().intValue()
                     : screen.getSeatCapacity().intValue();
 
-            dto.setAvailableSeats(availableSeats);
+            dto.setAvailableSeats((int) availableSeats);
 
             responseList.add(dto);
         }

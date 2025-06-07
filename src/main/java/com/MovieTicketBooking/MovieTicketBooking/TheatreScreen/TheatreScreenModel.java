@@ -75,4 +75,12 @@ public class TheatreScreenModel {
 
 //    public void setMovie(MovieModel movie) {
 //    }
+
+    public Long getAvailableSeats() {
+        return availableSeats;
+    }
+
+    public void setAvailableSeats(Long availableSeats) {
+        this.availableSeats = availableSeats;
+    }
 }
