@@ -2,8 +2,10 @@ package com.MovieTicketBooking.MovieTicketBooking.Admin;
 
 
 import com.MovieTicketBooking.MovieTicketBooking.Movie.MovieModel;
+import com.MovieTicketBooking.MovieTicketBooking.MovieDates.MovieDatesDto;
 import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangModel;
+import com.MovieTicketBooking.MovieTicketBooking.Theatre.TheatreModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -176,5 +178,12 @@ public class AdminController {
     public ResponseEntity<List<MovieGenreModel>> getgenre() {
         return adminService.getgenre();
     }
+
+    @GetMapping(path = "/getallmovs")
+    public ResponseEntity<List<MovieModel>> allmov() {
+        return adminService.getallmovs();
+    }
+
+
 
 }

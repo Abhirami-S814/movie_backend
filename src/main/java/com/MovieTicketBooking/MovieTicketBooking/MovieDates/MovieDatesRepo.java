@@ -9,9 +9,9 @@ import java.util.Optional;
 public interface MovieDatesRepo extends JpaRepository<MovieDatesModel,Integer> {
 
 
-    Optional<MovieDatesModel> findTopByTheatreIdAndScreenIdOrderByMovEndDesc(Integer theatreId, Integer screenId);
-
-    List<MovieDatesModel> findByTheatreIdAndScreenId(Integer theatreId, Integer screenId);
+//    Optional<MovieDatesModel> findTopByTheatreIdAndScreenIdOrderByMovEndDesc(Integer theatreId, Integer screenId);
+//
+//    List<MovieDatesModel> findByTheatreIdAndScreenId(Integer theatreId, Integer screenId);
 
     List<MovieDatesModel> findByTheatreId(Integer theatreId);
 
@@ -20,4 +20,6 @@ public interface MovieDatesRepo extends JpaRepository<MovieDatesModel,Integer> {
     boolean existsByMovieIdAndScreenIdAndTheatreId(Integer movieId, Integer screenId, Integer theatreId);
 
     Optional<MovieDatesModel> findByScreenId(Integer screenId);
+
+    Optional<MovieDatesModel> findByScreenIdAndMovieId(Integer screenId, Integer movieId);
 }

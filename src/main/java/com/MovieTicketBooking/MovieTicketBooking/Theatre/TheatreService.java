@@ -9,7 +9,6 @@ import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreRepo;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangrepo;
-import com.MovieTicketBooking.MovieTicketBooking.SeatAvailability.SeatAvailabilityRepo;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowDTO;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeDto;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeModel;
@@ -22,11 +21,7 @@ import com.MovieTicketBooking.MovieTicketBooking.TheatreTax.TheatreTaxModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreTax.TheatreTaxRepo;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCateCharge.TicketCateChargeModel;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCateCharge.TicketcateChargeRepo;
-import com.MovieTicketBooking.MovieTicketBooking.TicketCategory.TicketCategoryModel;
-import com.MovieTicketBooking.MovieTicketBooking.TicketCategory.TicketCategoryRepo;
-import com.MovieTicketBooking.MovieTicketBooking.TicketCharge.TicketChargeDto;
-import com.MovieTicketBooking.MovieTicketBooking.TicketCharge.TicketChargeModel;
-import com.MovieTicketBooking.MovieTicketBooking.TicketCharge.TicketChargeRepo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,12 +50,6 @@ public class TheatreService {
     ShowTimeRepo showTimeRepo;
 
     @Autowired
-    TicketCategoryRepo ticketCategoryRepo;
-
-    @Autowired
-    TicketChargeRepo ticketChargeRepo;
-
-    @Autowired
     TheatreScreenRepo theatreScreenRepo;
 
     @Autowired
@@ -68,9 +57,6 @@ public class TheatreService {
 
     @Autowired
     MovieDatesRepo movieDatesRepo;
-
-    @Autowired
-    SeatAvailabilityRepo seatAvailabilityRepo;
 
     @Autowired
     TicketcateChargeRepo ticketcateChargeRepo;
@@ -346,72 +332,72 @@ public class TheatreService {
         return new ResponseEntity<>(ticketCateChargeModels,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> addcharge(TicketChargeModel ticketChargeModel) {
-        TicketChargeModel ticketChargeModel1 = new TicketChargeModel();
-        ticketChargeModel1.setTicketCateId(ticketChargeModel.getTicketCateId());
-        ticketChargeModel1.setCharge(ticketChargeModel.getCharge());
-        ticketChargeRepo.save(ticketChargeModel1);
-        return new ResponseEntity<>(ticketChargeModel1,HttpStatus.OK);
-    }
-
-    public ResponseEntity<?> deletecharge(Integer ticketCateId, Integer theatreId) {
-        Optional<TicketChargeModel> optionalTicketChargeModel = ticketChargeRepo.findByTicketCateIdAndTheatreId(ticketCateId,theatreId);
-            if (optionalTicketChargeModel.isPresent()){
-                TicketChargeModel ticketChargeModel = optionalTicketChargeModel.get();
-                ticketChargeRepo.delete(ticketChargeModel);
-                return new ResponseEntity<>("Ticket charge deleted succesfully",HttpStatus.OK);
-            }
-            return new ResponseEntity<>("NOT FOUND",HttpStatus.NOT_FOUND);
-    }
-
-    public ResponseEntity<?> updatecharge(Integer ticketCateId, Integer theatreId,Long charge) {
-        Optional<TicketChargeModel> optionalTicketChargeModel = ticketChargeRepo.findByTicketCateIdAndTheatreId(ticketCateId,theatreId);
-        if (optionalTicketChargeModel.isPresent()){
-            TicketChargeModel ticketChargeModel = optionalTicketChargeModel.get();
-            ticketChargeModel.setCharge(charge);
-            ticketChargeRepo.save(ticketChargeModel);
-            return new ResponseEntity<>("Updated successfully",HttpStatus.OK);
-        }
-        return new ResponseEntity<>("NOT FOUND",HttpStatus.NOT_FOUND);
-    }
-
-
-    public ResponseEntity<List<TicketChargeDto>> getchargedetails(Integer theatreId) {
-
-        List<TheatreModel> theatreModels = theatreRepo.findByTheatreId(theatreId);
-        if (theatreModels == null || theatreModels.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        TheatreModel theatreModel = theatreModels.get(0);
-
-        List<TicketChargeModel> ticketChargeModels = ticketChargeRepo.findByTheatreId(theatreId);
-
-
-        List<TicketChargeDto> ticketChargeDtoList = new ArrayList<>();
-        for (TicketChargeModel ticketChargeModel : ticketChargeModels) {
-            TicketChargeDto ticketChargeDto = new TicketChargeDto();
-
-            ticketChargeDto.setTicketCateId(ticketChargeModel.getTicketCateId());
-            ticketChargeDto.setChargeId(ticketChargeModel.getChargeId());
-            ticketChargeDto.setCharge(ticketChargeModel.getCharge());
-
-            TicketCategoryModel ticketCategoryModel = ticketCategoryRepo.findById(ticketChargeModel.getTicketCateId()).orElse(null);
-
-            if (ticketCategoryModel != null) {
-                ticketChargeDto.setTicketCate(ticketCategoryModel.getTicketCate());
-            } else {
-                ticketChargeDto.setTicketCate("Unknown Category");
-            }
-
-            ticketChargeDto.setTheatreId(theatreId);
-            ticketChargeDto.setTheatreName(theatreModel.getName());
-
-            ticketChargeDtoList.add(ticketChargeDto);
-        }
-
-        return new ResponseEntity<>(ticketChargeDtoList, HttpStatus.OK);
-    }
+//    public ResponseEntity<?> addcharge(TicketChargeModel ticketChargeModel) {
+//        TicketChargeModel ticketChargeModel1 = new TicketChargeModel();
+//        ticketChargeModel1.setTicketCateId(ticketChargeModel.getTicketCateId());
+//        ticketChargeModel1.setCharge(ticketChargeModel.getCharge());
+//        ticketChargeRepo.save(ticketChargeModel1);
+//        return new ResponseEntity<>(ticketChargeModel1,HttpStatus.OK);
+//    }
+//
+//    public ResponseEntity<?> deletecharge(Integer ticketCateId, Integer theatreId) {
+//        Optional<TicketChargeModel> optionalTicketChargeModel = ticketChargeRepo.findByTicketCateIdAndTheatreId(ticketCateId,theatreId);
+//            if (optionalTicketChargeModel.isPresent()){
+//                TicketChargeModel ticketChargeModel = optionalTicketChargeModel.get();
+//                ticketChargeRepo.delete(ticketChargeModel);
+//                return new ResponseEntity<>("Ticket charge deleted succesfully",HttpStatus.OK);
+//            }
+//            return new ResponseEntity<>("NOT FOUND",HttpStatus.NOT_FOUND);
+//    }
+//
+//    public ResponseEntity<?> updatecharge(Integer ticketCateId, Integer theatreId,Long charge) {
+//        Optional<TicketChargeModel> optionalTicketChargeModel = ticketChargeRepo.findByTicketCateIdAndTheatreId(ticketCateId,theatreId);
+//        if (optionalTicketChargeModel.isPresent()){
+//            TicketChargeModel ticketChargeModel = optionalTicketChargeModel.get();
+//            ticketChargeModel.setCharge(charge);
+//            ticketChargeRepo.save(ticketChargeModel);
+//            return new ResponseEntity<>("Updated successfully",HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>("NOT FOUND",HttpStatus.NOT_FOUND);
+//    }
+//
+//
+//    public ResponseEntity<List<TicketChargeDto>> getchargedetails(Integer theatreId) {
+//
+//        List<TheatreModel> theatreModels = theatreRepo.findByTheatreId(theatreId);
+//        if (theatreModels == null || theatreModels.isEmpty()) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        TheatreModel theatreModel = theatreModels.get(0);
+//
+//        List<TicketChargeModel> ticketChargeModels = ticketChargeRepo.findByTheatreId(theatreId);
+//
+//
+//        List<TicketChargeDto> ticketChargeDtoList = new ArrayList<>();
+//        for (TicketChargeModel ticketChargeModel : ticketChargeModels) {
+//            TicketChargeDto ticketChargeDto = new TicketChargeDto();
+//
+//            ticketChargeDto.setTicketCateId(ticketChargeModel.getTicketCateId());
+//            ticketChargeDto.setChargeId(ticketChargeModel.getChargeId());
+//            ticketChargeDto.setCharge(ticketChargeModel.getCharge());
+//
+//            TicketCateChargeModel ticketCategoryModel = ticketcateChargeRepo.findById(ticketChargeModel.getTicketCateId()).orElse(null);
+//
+//            if (ticketCategoryModel != null) {
+//                ticketChargeDto.setTicketCate(ticketCategoryModel.getTicketcate());
+//            } else {
+//                ticketChargeDto.setTicketCate("Unknown Category");
+//            }
+//
+//            ticketChargeDto.setTheatreId(theatreId);
+//            ticketChargeDto.setTheatreName(theatreModel.getName());
+//
+//            ticketChargeDtoList.add(ticketChargeDto);
+//        }
+//
+//        return new ResponseEntity<>(ticketChargeDtoList, HttpStatus.OK);
+//    }
 
 
     public ResponseEntity<?> addScreenmovie(Integer theatreId, TheatreScreenModel theatreScreenModel) {
@@ -562,16 +548,17 @@ public class TheatreService {
         return new ResponseEntity<>("NOT FOUND",HttpStatus.NOT_FOUND);
     }
 
-    public ResponseEntity<?> updateshowdate(Integer dateId, LocalDate movEnd) {
+    public boolean updateshowdate(Integer dateId, LocalDate movEnd) {
         Optional<MovieDatesModel> optionalMovieDatesModel = movieDatesRepo.findById(dateId);
-        if (optionalMovieDatesModel.isPresent()){
+        if (optionalMovieDatesModel.isPresent()) {
             MovieDatesModel movieDatesModel = optionalMovieDatesModel.get();
             movieDatesModel.setMovEnd(movEnd);
             movieDatesRepo.save(movieDatesModel);
-            return new ResponseEntity<>("Movie end date updated",HttpStatus.OK);
+            return true;
         }
-        return new ResponseEntity<>("Not found",HttpStatus.NOT_FOUND);
+        return false;
     }
+
 
 
     public ResponseEntity<List<MovieDatesDto>> getallshowdate(Integer theatreId) {
@@ -878,22 +865,27 @@ public class TheatreService {
     }
 
 
-
     @Transactional
     public List<TheatreScreenMovDTO> getScreenshow(Integer screenId) {
         List<TheatreScreenModel> screens = theatreScreenRepo.findByScreenId(screenId);
         List<TheatreScreenMovDTO> responseList = new ArrayList<>();
 
-        Optional<TheatreModel> optionalTheatreModel = theatreRepo.findById(screenId);
-        String theatrename = optionalTheatreModel.map(TheatreModel::getName).orElse("Unknown Theatre");
-
         for (TheatreScreenModel screen : screens) {
             TheatreScreenMovDTO dto = new TheatreScreenMovDTO();
+
+            // Fetch theatre name using correct theatreId
+            Optional<TheatreModel> optionalTheatreModel = theatreRepo.findById(screen.getTheatreId());
+            String theatrename = optionalTheatreModel.map(TheatreModel::getName).orElse("Unknown Theatre");
+
+            // Set basic screen and theatre info
             dto.setTheatreId(screen.getTheatreId());
             dto.setName(theatrename);
             dto.setScreenId(screen.getScreenId());
             dto.setScreenName(screen.getScreenName());
             dto.setSeatCapacity(screen.getSeatCapacity());
+
+            // Correct conversion from Long → Integer with null handling
+            dto.setAvailableSeats(screen.getAvailableSeats() != null ? screen.getAvailableSeats().intValue() : null);
 
             // Movie info
             MovieModel movie = screen.getMovie();
@@ -908,8 +900,8 @@ public class TheatreService {
                     dto.setMovEnd(movieDate.getMovEnd());
                 });
 
-                // Fetch all showtimes for this movie and theatre
-                List<ShowTimeModel> showTimeModels = showTimeRepo.findAllByMovieIdAndTheatreId(movie.getMovieId(), screenId);
+                // Fetch all showtimes for this movie and theatre (correct theatreId used now)
+                List<ShowTimeModel> showTimeModels = showTimeRepo.findAllByMovieIdAndTheatreId(movie.getMovieId(), screen.getTheatreId());
 
                 // Map showTimeModels to ShowDTO list
                 List<ShowDTO> showDTOList = showTimeModels.stream().map(showTime -> {
@@ -922,18 +914,80 @@ public class TheatreService {
                 dto.setShowTimes(showDTOList);
 
             } else {
+                // No movie assigned
                 dto.setMovieId(null);
                 dto.setMovieName("No Movie Assigned");
                 dto.setShowTimes(new ArrayList<>());
             }
-
-            // Remove this line if you want to stop showing a single showTimeId
 
             responseList.add(dto);
         }
 
         return responseList;
     }
+
+    public ResponseEntity<MovieDatesDto> getshowdate(Integer screenId, Integer movieId) {
+        Optional<MovieDatesModel> showDateOpt = movieDatesRepo.findByScreenIdAndMovieId(screenId, movieId);
+
+        if (showDateOpt.isPresent()) {
+            MovieDatesModel showDate = showDateOpt.get();
+
+            MovieDatesDto dto = new MovieDatesDto();
+            dto.setDateId(showDate.getDateId());
+            dto.setMovStart(showDate.getMovStart());
+            dto.setMovEnd(showDate.getMovEnd());
+            dto.setMovieId(showDate.getMovieId());
+            dto.setScreenId(showDate.getScreenId());
+            dto.setTheatreId(showDate.getTheatreId());
+
+            // Fetch theatre name
+            theatreRepo.findById(showDate.getTheatreId())
+                    .ifPresent(theatre -> dto.setName(theatre.getName()));
+
+
+
+            // Fetch movie name
+            movieRepo.findById(showDate.getMovieId())
+                    .ifPresent(movie -> dto.setMovieName(movie.getMovieName()));
+
+            return ResponseEntity.ok(dto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    public ResponseEntity<List<MovieDatesDto>> getAllMovShows() {
+        LocalDate today = LocalDate.now();
+
+        List<MovieDatesModel> movieDatesList = movieDatesRepo.findAll();
+
+        List<MovieDatesModel> validMovieDates = movieDatesList.stream()
+                .filter(movieDate -> !movieDate.getMovEnd().isBefore(today))
+                .collect(Collectors.toList());
+
+        if (validMovieDates.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<MovieDatesDto> movieDatesDtoList = validMovieDates.stream().map(movieDate -> {
+            MovieDatesDto dto = new MovieDatesDto();
+            dto.setDateId(movieDate.getDateId());
+            dto.setTheatreId(movieDate.getTheatreId());
+            dto.setScreenId(movieDate.getScreenId());
+            dto.setMovieId(movieDate.getMovieId());
+            dto.setMovStart(movieDate.getMovStart());
+            dto.setMovEnd(movieDate.getMovEnd());
+
+            theatreRepo.findById(movieDate.getTheatreId()).ifPresent(theatre -> dto.setName(theatre.getName()));
+            theatreScreenRepo.findById(movieDate.getScreenId()).ifPresent(screen -> dto.setScreenName(screen.getScreenName()));
+            movieRepo.findById(movieDate.getMovieId()).ifPresent(movie -> dto.setMovieName(movie.getMovieName()));
+
+            return dto;
+        }).collect(Collectors.toList());
+
+        return new ResponseEntity<>(movieDatesDtoList, HttpStatus.OK);
+    }
+
 
 //    public List<TheatreScreenMovDTO> getTheatreMovieDetails(Integer movieId) {
 //        List<TheatreScreenModel> screens = theatreScreenRepo.findByMovie_MovieId(movieId);

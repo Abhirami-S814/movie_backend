@@ -203,7 +203,7 @@ public class UserService {
             return ResponseEntity.notFound().build();
         }
     }
-
+    @Transactional  // Make sure this method runs in a transaction
     public TicketBookingModel bookTicket(TicketBookingModel booking) {
         long totalBeforeTax = 0L;
         int totalTicketsBooked = 0;
@@ -217,7 +217,7 @@ public class UserService {
             Long price = charge.getTicketcharge();
             categoryBooking.setPricePerTicket(price);
             categoryBooking.setTotalPrice(price * categoryBooking.getQuantity());
-            categoryBooking.setBooking(booking); // Important for the @ManyToOne relationship
+            categoryBooking.setBooking(booking); // For cascade save
 
             totalBeforeTax += categoryBooking.getTotalPrice();
             totalTicketsBooked += categoryBooking.getQuantity();
@@ -234,29 +234,37 @@ public class UserService {
         booking.setTaxAmount(taxAmount);
         booking.setTotalWithTax(totalWithTax);
 
-        // Step 3: Validate screen capacity
+        // Step 3: Validate screen capacity per show date and time
         TheatreScreenModel screen = theatreScreenRepo.findById(booking.getScreenId())
                 .orElseThrow(() -> new RuntimeException("Screen not found"));
 
-        Long availableBefore = screen.getAvailableSeats();
-        if (availableBefore == null) {
-            // fallback to total capacity if availableSeats not set
-            availableBefore = screen.getSeatCapacity();
-            screen.setAvailableSeats(availableBefore);  // persist this fix if you want
-        }
-        if (availableBefore < totalTicketsBooked) {
-            throw new RuntimeException("Not enough seats available on screen");
-        }
-        Long availableAfter = availableBefore - totalTicketsBooked;
-        booking.setSeatCapacityBeforeBooking(availableBefore);
-        booking.setSeatCapacityAfterBooking(availableAfter);
+        // Step 4: Fetch existing bookings with pessimistic lock to avoid race condition
+        List<TicketBookingModel> existingBookings = ticketBookingRepo
+                .findByScreenIdAndShowDateAndShowTimeForUpdate(
+                        booking.getScreenId(), booking.getShowDate(), booking.getShowTime());
 
-        screen.setAvailableSeats(availableAfter);
-        theatreScreenRepo.save(screen);
+        // Step 5: Sum all tickets already booked at this screen, date, and time
+        int alreadyBookedTickets = 0;
+        for (TicketBookingModel b : existingBookings) {
+            for (TicketCategoryBookingModel cb : b.getCategoryBookings()) {
+                alreadyBookedTickets += cb.getQuantity();
+            }
+        }
+
+        // Calculate available seats dynamically
+        Long totalCapacity = screen.getSeatCapacity();
+        Long availableSeatsForShow = totalCapacity - alreadyBookedTickets;
+
+        if (availableSeatsForShow < totalTicketsBooked) {
+            throw new RuntimeException("Not enough seats available for the selected show date and time");
+        }
+
+        booking.setSeatCapacityBeforeBooking(availableSeatsForShow);
+        booking.setSeatCapacityAfterBooking(availableSeatsForShow - totalTicketsBooked);
 
         booking.setBookingDateTime(LocalDateTime.now());
 
-        // Step 5: Save booking (cascades will save category bookings too)
+        // Step 6: Save booking (cascade saves category bookings)
         return ticketBookingRepo.save(booking);
     }
 
@@ -304,6 +312,11 @@ public class UserService {
                 showTime,
                 availableSeats
         );
+    }
+
+    public List<TicketBookingModel> getAllBookings() {
+        return ticketBookingRepo.findAll();
+
     }
 
 //    public void createBooking(BookingRequestDTO bookingRequestDTO) {

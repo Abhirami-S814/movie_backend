@@ -125,4 +125,10 @@ public class UserController {
         AvailableSeatsDTO dto = userService.getAvailableSeats(screenId, showDate, showTime);
         return ResponseEntity.ok(dto);
     }
+
+    @GetMapping("/getallbookings")
+    public ResponseEntity<List<TicketBookingModel>> getAllBookings() {
+        List<TicketBookingModel> bookings = userService.getAllBookings();
+        return ResponseEntity.ok(bookings);
+    }
 }

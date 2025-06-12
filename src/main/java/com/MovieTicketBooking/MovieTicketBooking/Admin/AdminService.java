@@ -8,6 +8,7 @@ import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreRepo;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangModel;
 import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangrepo;
+import com.MovieTicketBooking.MovieTicketBooking.Theatre.TheatreModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,7 @@ public class AdminService {
 
     @Autowired
     MovieGenreRepo movieGenreRepo;
+
 
     //admin user
     public ResponseEntity<?> addadmin(AdminModel adminModel) {
@@ -203,5 +205,18 @@ public class AdminService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public ResponseEntity<List<MovieModel>> getallmovs() {
+        try {
+            List<MovieModel> movieModels = movieRepo.findAll();
+            System.out.println("Movies fetched: " + movieModels.size()); // Add this line
+
+            return new ResponseEntity<>(movieModels, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the actual exception
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 }

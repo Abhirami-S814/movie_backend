@@ -3,8 +3,6 @@ package com.MovieTicketBooking.MovieTicketBooking.Theatre;
 
 import com.MovieTicketBooking.MovieTicketBooking.MovieDates.MovieDatesDto;
 import com.MovieTicketBooking.MovieTicketBooking.MovieDates.MovieDatesModel;
-import com.MovieTicketBooking.MovieTicketBooking.MovieGenre.MovieGenreModel;
-import com.MovieTicketBooking.MovieTicketBooking.MovieLang.MovieLangModel;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeDto;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenDTO;
@@ -12,10 +10,8 @@ import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenMode
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenMovDTO;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreTax.TheatreTaxModel;
 import com.MovieTicketBooking.MovieTicketBooking.TicketCateCharge.TicketCateChargeModel;
-import com.MovieTicketBooking.MovieTicketBooking.TicketCategory.TicketCategoryModel;
-import com.MovieTicketBooking.MovieTicketBooking.TicketCharge.TicketChargeDto;
-import com.MovieTicketBooking.MovieTicketBooking.TicketCharge.TicketChargeModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -257,21 +253,41 @@ public class TheatreController {
     }
 
     //update show end date
-    @PutMapping("updateshowdate")
-    public ResponseEntity<?> updateShowdate(@RequestParam Integer dateId, @RequestParam LocalDate movEnd){
-        try{
-            return theatreService.updateshowdate(dateId,movEnd);
+    @PutMapping("/updateshowdate")
+    public ResponseEntity<?> updateShowdate(@RequestParam Integer dateId,
+                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate movEnd) {
+        try {
+            boolean updated = theatreService.updateshowdate(dateId, movEnd);
+            if (updated) {
+                return ResponseEntity.ok("Movie end date updated");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("Something went wrong",HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
     //get all show dates of screen
     @GetMapping("/getallshowdates")
     public ResponseEntity<List<MovieDatesDto>> getAllShowdates(@RequestParam Integer theatreId) {
         return theatreService.getallshowdate(theatreId);
     }
+
+    @GetMapping("/getallmovshows")
+    public ResponseEntity<List<MovieDatesDto>> getAllMovShows() {
+        return theatreService.getAllMovShows();
+    }
+
+
+    @GetMapping("/getshowdates")
+    public ResponseEntity<MovieDatesDto> getShowdates(@RequestParam Integer screenId,
+                                                      @RequestParam Integer movieId) {
+        return theatreService.getshowdate(screenId,movieId);
+    }
+
 
 //--------------------------show date--------------------------------------------------------------
 
@@ -351,11 +367,7 @@ public class TheatreController {
         return theatreService.getMoviesWithShowtimes(date);
     }
 
-//    //seat availability
-//    @PostMapping("/availableseats")
-//    public ResponseEntity<SeatAvailabilityModel> addSeats(@RequestParam Integer screenId) {
-//        return ResponseEntity.ok(theatreService.availableseats(screenId));
-//    }
+
 
 
 

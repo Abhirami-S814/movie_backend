@@ -1,7 +1,6 @@
 package com.MovieTicketBooking.MovieTicketBooking.Theatre;
 
 
-import com.MovieTicketBooking.MovieTicketBooking.TicketCategory.TicketCategoryModel;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
