@@ -3,6 +3,7 @@ package com.MovieTicketBooking.MovieTicketBooking.Theatre;
 
 import com.MovieTicketBooking.MovieTicketBooking.MovieDates.MovieDatesDto;
 import com.MovieTicketBooking.MovieTicketBooking.MovieDates.MovieDatesModel;
+import com.MovieTicketBooking.MovieTicketBooking.MovieDates.MovieDatesRepo;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeDto;
 import com.MovieTicketBooking.MovieTicketBooking.ShowTime.ShowTimeModel;
 import com.MovieTicketBooking.MovieTicketBooking.TheatreScreen.TheatreScreenDTO;
@@ -28,6 +29,9 @@ public class TheatreController {
 
     @Autowired
     TheatreService theatreService;
+
+    @Autowired
+    MovieDatesRepo movieDatesRepo;
 
     //theatre Regtn
     @PostMapping(path = "/theatreregtn")
@@ -268,6 +272,14 @@ public class TheatreController {
             return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/getshowdatesbyscreen")
+    public ResponseEntity<?> getShowDatesByTheatre(@RequestParam Integer theatreId) {
+        List<MovieDatesModel> dates = movieDatesRepo.findByTheatreId(theatreId);
+        return ResponseEntity.ok(dates);
+    }
+
+
 
 
     //get all show dates of screen

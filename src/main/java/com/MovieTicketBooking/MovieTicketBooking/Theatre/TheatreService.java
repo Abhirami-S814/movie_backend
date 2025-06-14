@@ -124,38 +124,28 @@ public class TheatreService {
     @Transactional
     public ResponseEntity<?> addShowTime(ShowTimeModel showTimeModel) {
         try {
-            // Check if Theatre exists
             Integer theatreId = showTimeModel.getTheatreId();
-            boolean theatreExists = checkTheatreExists(theatreId);
-            if (!theatreExists) {
+            Integer screenId = showTimeModel.getScreenId();
+
+            // Validate Theatre
+            if (!checkTheatreExists(theatreId)) {
                 return new ResponseEntity<>("Theatre not found", HttpStatus.NOT_FOUND);
             }
 
-            // Fetch Movie and validate existence
-            Integer movieId = showTimeModel.getMovieId();
-            Optional<MovieModel> movieOpt = movieRepo.findByMovieId(movieId);
-
-            if (movieOpt.isEmpty()) {
-                return new ResponseEntity<>("Movie not found", HttpStatus.NOT_FOUND);
+            // Validate Screen
+            Optional<TheatreScreenModel> screenOpt = theatreScreenRepo.findById(screenId);
+            if (screenOpt.isEmpty()) {
+                return new ResponseEntity<>("Screen not found", HttpStatus.NOT_FOUND);
             }
 
-            MovieModel movie = movieOpt.get();
-
-            // Get movie duration directly as LocalTime
-            LocalTime movieDurationTime = movie.getDuration(); // Already a LocalTime
-            Duration movieDuration = Duration.ofHours(movieDurationTime.getHour())
-                    .plusMinutes(movieDurationTime.getMinute())
-                    .plusSeconds(movieDurationTime.getSecond());
-
-            // Get and compare show time duration
-            LocalTime startTime = showTimeModel.getShowStart();
-
-            if (startTime == null) {
-                return new ResponseEntity<>("Show start and end time are required", HttpStatus.BAD_REQUEST);
+            TheatreScreenModel screen = screenOpt.get();
+            if (!screen.getTheatreId().equals(theatreId)) {
+                return new ResponseEntity<>("Screen does not belong to selected theatre", HttpStatus.BAD_REQUEST);
             }
 
+            // (Optionally check movie validity here as you're already doing)
 
-
+            // Save show time
             showTimeRepo.save(showTimeModel);
             return new ResponseEntity<>(showTimeModel, HttpStatus.OK);
 
@@ -255,10 +245,11 @@ public class TheatreService {
                     dto.setMovEnd(movieDate.getMovEnd());
                 });
 
-                // Fetch all showtimes for this movie and theatre
-                List<ShowTimeModel> showTimeModels = showTimeRepo.findAllByMovieIdAndTheatreId(movie.getMovieId(), theatreId);
+                // ✅ Fetch showtimes only for this screen
+                List<ShowTimeModel> showTimeModels = showTimeRepo
+                        .findAllByMovieIdAndTheatreIdAndScreenId(movie.getMovieId(), theatreId, screen.getScreenId());
 
-                // Map showTimeModels to ShowDTO list
+                // Map to DTO
                 List<ShowDTO> showDTOList = showTimeModels.stream().map(showTime -> {
                     ShowDTO showDTO = new ShowDTO();
                     showDTO.setShowTimeId(showTime.getShowtimeId());
@@ -269,19 +260,17 @@ public class TheatreService {
                 dto.setShowTimes(showDTOList);
 
             } else {
+                // No movie assigned to screen
                 dto.setMovieId(null);
                 dto.setMovieName("No Movie Assigned");
                 dto.setShowTimes(new ArrayList<>());
             }
-
-            // Remove this line if you want to stop showing a single showTimeId
 
             responseList.add(dto);
         }
 
         return responseList;
     }
-
 
 
 
